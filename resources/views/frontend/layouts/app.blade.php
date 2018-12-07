@@ -408,7 +408,7 @@
     @yield('breadcrumbs')
     {{-- End Page --}}
     {{-- Footer --}}
-    @if(!Request::is('messages'))
+    @if(!Request::is('login') && !Request::is('messages'))
       @include('frontend.layouts.inc.footer')
     @endif
     {{-- Start Login Modal --}}
