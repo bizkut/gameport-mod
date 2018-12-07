@@ -35,6 +35,7 @@ return array(
         storage_path('app/public/users'),
         storage_path('app/public/listings'),
         storage_path('app/public/articles'),
+        storage_path('app/public/emoticals'),
         public_path('images')
     ),
 

@@ -4,6 +4,14 @@ $o_t = array_diff($thread->participantsUserIds(), array(Auth::user()->id ));
 $o_t_last_read = \Cmgmyr\Messenger\Models\Participant::where('thread_id', $thread->id)->where('user_id', reset($o_t))->first()->last_read;
 @endphp
 
+@php
+$emotical_arrays = array();
+$emoticals = \App\Models\Emotical::where('status', 'PUBLISHED')->get();
+foreach ($emoticals as $emotical) {
+    $emotical_arrays[$emotical->string] = '<img src="' . $emotical->image . '">';
+}
+@endphp
+
 {{-- Check if more messages are available --}}
 @if($messages->hasMorePages())
   {{-- Button to load new messages --}}
@@ -36,7 +44,7 @@ if(Auth::user()->id == $message->user_id){
     </div>
     <div class="chat-body">
       <div class="chat-content">
-        <div class="text">{{ $message->body }}</div>
+        <div class="text">{!! str_replace(array_keys($emotical_arrays), array_values($emotical_arrays), $message->body) !!}</div>
         @if($order == 'right')
           <div class="chat-read-badge {{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? '' : 'read' }}" data-toggle="tooltip" data-placement="{{ $order }}" title="{{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? trans('offers.general.chat_sent') : trans('offers.general.chat_read') }}"><i class="fas fa-check-double"></i></div>
         @endif
@@ -47,7 +55,7 @@ if(Auth::user()->id == $message->user_id){
 @elseif($prev_user === $message->user_id)
 
       <div class="chat-content">
-        <div class="text">{{ $message->body }}</div>
+        <div class="text">{!! str_replace(array_keys($emotical_arrays), array_values($emotical_arrays), $message->body) !!}</div>
         @if($order == 'right')
           <div class="chat-read-badge {{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? '' : 'read' }}" data-toggle="tooltip" data-placement="{{ $order }}" title="{{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? trans('offers.general.chat_sent') : trans('offers.general.chat_read') }}"><i class="fas fa-check-double"></i></div>
         @endif
@@ -67,7 +75,7 @@ if(Auth::user()->id == $message->user_id){
     </div>
     <div class="chat-body">
       <div class="chat-content">
-        <div class="text">{{ $message->body }}</div>
+        <div class="text">{!! str_replace(array_keys($emotical_arrays), array_values($emotical_arrays), $message->body) !!}</div>
         @if($order == 'right')
           <div class="chat-read-badge {{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? '' : 'read' }}" data-toggle="tooltip" data-placement="{{ $order }}" title="{{ ( is_null($o_t_last_read) || $o_t_last_read < $message->created_at ) ? trans('offers.general.chat_sent') : trans('offers.general.chat_read') }}"><i class="fas fa-check-double"></i> </div>
         @endif

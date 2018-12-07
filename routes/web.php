@@ -96,6 +96,11 @@ Route::group(['prefix' => config('backpack.base.route_prefix', 'admin'), 'middle
         CRUD::resource('comment', 'Admin\CommentCrudController');
     });
 
+    Route::group(['middleware' => ['permission:edit_emotical']], function()
+    {
+        CRUD::resource('emotical', 'Admin\EmoticalCrudController');
+    });
+    
     Route::group(['middleware' => ['permission:edit_payments']], function()
     {
         CRUD::resource('payment', 'Admin\PaymentCrudController');

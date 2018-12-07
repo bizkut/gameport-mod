@@ -108,6 +108,13 @@ class PermissionsTableSeeder extends Seeder
                 'created_at' => '2017-01-21 23:16:30',
                 'updated_at' => '2017-01-21 23:16:30',
             ),
+            13 =>
+            array (
+                'id' => 14,
+                'name' => 'edit_emotical',
+                'created_at' => '2017-01-21 23:17:30',
+                'updated_at' => '2017-01-21 23:17:30',
+            ),
         ));
 
 
