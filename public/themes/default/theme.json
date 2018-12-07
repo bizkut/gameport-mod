@@ -1,0 +1,9 @@
+{
+	"slug": "default",
+	"name": "Default Theme",
+	"author": "Wiledia",
+	"description": "The default GamePort theme from wiledia.",
+	"version": "1.4",
+  "gameport_version": "1.4",
+  "public": true
+}
