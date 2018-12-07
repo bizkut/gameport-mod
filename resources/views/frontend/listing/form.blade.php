@@ -22,6 +22,79 @@
 @stop
 
 @section('content')
+{{-- Start Quick Links --}}
+<div class="flex-center wrap m-b-20">
+  {{-- Dashboard listings quick action --}}
+  <a href="{{ url('listings/add') }}" class="quick-action quick-action-orange">
+    <div class="quick-icon">
+      <i class="fa fa-tag"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('users.dash.quick_listing') }}
+    </div>
+  </a>
+  {{-- Dashboard listing quick action --}}
+  <a href="{{ url('dash/listings') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-tags"></i>@if((count($user->listings->where('status',0))+count($user->listings->where('status',1))) > 0)<span class="badge badge-dark badge-sm up">{{(count($user->listings->where('status',0))+count($user->listings->where('status',1)))}}</span>@endif
+    </div>
+    <div class="quick-text">
+      {{ trans('general.listings') }}
+    </div>
+  </a>
+  {{-- Dashboard offers quick action --}}
+  <a href="{{ url('dash/offers') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-briefcase"></i>@if((count($user->offers->where('status',0)->where('declined',0)) + count($user->offers->where('status',1)->where('declined',0))) > 0)<span class="badge badge-dark badge-sm up">{{count($user->offers->where('status',0)->where('declined',0)) + count($user->offers->where('status',1)->where('declined',0))}}</span>@endif
+    </div>
+    <div class="quick-text">
+      {{ trans('general.offers') }}
+    </div>
+  </a>
+  {{-- Dashboard wishlist quick action --}}
+  <a href="{{ url('dash/wishlist') }}" class="quick-action">
+    {{-- Icon --}}
+    <div class="quick-icon">
+      <i class="fa fa-heart"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('wishlist.wishlist') }}
+    </div>
+  </a>
+  {{-- Dashboard messenger quick action --}}
+  <a href="{{ url('messages') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fas {{ Auth::user()->unreadMessagesCount()>0 ? 'fa-envelope-open' : 'fa-envelope'}}"></i>@if(Auth::user()->unreadMessagesCount()>0)<span class="badge badge-danger badge-sm up">{{Auth::user()->unreadMessagesCount()}}</span> @endif
+    </div>
+    <div class="quick-text">
+      {{ trans('messenger.messenger') }}
+    </div>
+  </a>
+  {{-- Dashboard notifications quick action --}}
+  <a href="{{ url('dash/notifications') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-bell @if(count(Auth::user()->unreadNotifications)>0) faa-shake animated @endif"></i>@if(count(Auth::user()->unreadNotifications)>0)<span class="badge badge-danger badge-sm up">{{count(Auth::user()->unreadNotifications)}}</span> @endif
+    </div>
+    <div class="quick-text">
+      {{ trans('notifications.title') }}
+    </div>
+  </a>
+  {{-- Dashboard Settings quick action --}}
+  <a href="{{ url('dash/settings') }}" class="quick-action">
+    <div class="quick-icon">
+      <i class="fa fa-wrench"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('users.dash.settings.settings') }}
+    </div>
+  </a>
+</div>
+{{-- End Quick Links --}}
+
 {{-- Show selected game when game is set --}}
 @if(isset($game))
 

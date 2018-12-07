@@ -2390,6 +2390,47 @@ background-color: rgba(255,255,255,1) !important;
 }
 
 /*------------------------------------------------------------------
+[ Contenttab ]
+*/
+.contenttab {
+  overflow: hidden !important;
+}
+
+.contenttab .tabs {
+  z-index:3;
+  position:relative;
+  height: 50px;
+  align-items: center;
+}
+
+.contenttab .tabs .tab {
+  color: rgba(255,255,255,0.5);
+  background-color: rgba(52,50,50,0.5);
+  border-radius: 5px 5px 0px 0px;
+  display: inline-block;
+  line-height: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0px 20px;
+  margin-right: 5px;
+  -moz-transition: all .3s ease 0s;
+  -webkit-transition: all .3s ease 0s;
+  -o-transition: all .3s ease 0s;
+  transition: all .3s ease 0s;
+}
+
+.contenttab .tabs .tab:hover, .contenttab .tabs .tab:active, .contenttab .tabs .tab:focus {
+  color: rgba(255,255,255,1);
+  background-color: rgba(52,50,50,1);
+  text-decoration: none;
+}
+
+.contenttab .tabs .tab.active {
+  color: #fff;
+  background-color: #424242;
+}
+
+/*------------------------------------------------------------------
 [ Listing form ]
 */
 
@@ -4519,7 +4560,7 @@ a:hover {
 
 .empty-list {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 70%; left: 50%;
   transform: translate(-50%,-50%);
   text-align: center !important;
   width: 300px;
@@ -6568,8 +6609,8 @@ display: block;
 .page {
 margin: 0 auto;
 position: relative;
-min-height: -webkit-calc(100% - 44px);
-min-height: calc(100% - 44px);
+min-height: -webkit-calc(100% + 44px);
+min-height: calc(100% + 44px);
 }
 
 .page-dark.layout-full {

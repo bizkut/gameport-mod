@@ -238,8 +238,15 @@ class GameController
 
         // Page title
         SEO::setTitle(trans('general.title.game_add', ['page_name' => config('settings.page_name')]));
+        
+        if (! \Auth::user()->isActive()) {
+            \Auth::logout();
+            return redirect('login')->with('error', trans('auth.deactivated'));
+        }
 
-        return view('frontend.game.add', ['platforms' => Platform::all()]);
+        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+
+        return view('frontend.game.add', ['platforms' => Platform::all(), 'user' => $user]);
     }
 
     /**

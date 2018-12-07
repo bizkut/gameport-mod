@@ -34,7 +34,9 @@ class WishlistController extends Controller
       // SEO Page Title
       SEO::setTitle(trans('wishlist.wishlist'). ' - ' . config('settings.page_name') . ' » ' . config('settings.sub_title'));
 
-      return view('frontend.wishlist.index', ['wishlists' => $wishlists]);
+      $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+
+      return view('frontend.wishlist.index', ['wishlists' => $wishlists, 'user' => $user]);
     }
 
     /**

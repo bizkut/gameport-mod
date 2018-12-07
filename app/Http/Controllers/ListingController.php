@@ -267,7 +267,9 @@ class ListingController
 
         SEO::setTitle(trans('general.title.listing_add', ['page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
 
-        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all()]);
+        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+
+        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all(), 'user' => $user]);
     }
 
     /**

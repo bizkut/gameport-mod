@@ -29,18 +29,6 @@
       {{ trans('users.dash.quick_listing') }}
     </div>
   </a>
-  {{-- Dashboard game quick action --}}
-  {{-- Check if user can add games to the system --}}
-  @if(Config::get('settings.user_add_item'))
-  <a href="{{ url('games/add') }}" class="quick-action quick-action-primary">
-    <div class="quick-icon">
-      <i class="fa fa-gamepad"></i>
-    </div>
-    <div class="quick-text">
-      {{ trans('users.dash.quick_game') }}
-    </div>
-  </a>
-  @endif
   {{-- Dashboard listing quick action --}}
   <a href="{{ url('dash/listings') }}" class="quick-action">
     {{-- Icon with count --}}

@@ -2,7 +2,7 @@
 
 @section('subheader')
 
-  <div class="subheader {{ count($user->offers) == 0 && $offers_trashed_count == 0 ? '' : 'tabs' }}">
+  <div class="subheader">
 
     <div class="background-pattern" style="background-image: url('{{ asset('/img/game_pattern.png') }}') !important;"></div>
     <div class="background-color"></div>
@@ -45,6 +45,104 @@
 
 
 @section('content')
+
+{{-- Start Quick Links --}}
+<div class="flex-center wrap m-b-20">
+  {{-- Dashboard listings quick action --}}
+  <a href="{{ url('listings/add') }}" class="quick-action quick-action-orange">
+    <div class="quick-icon">
+      <i class="fa fa-tag"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('users.dash.quick_listing') }}
+    </div>
+  </a>
+  {{-- Dashboard listing quick action --}}
+  <a href="{{ url('dash/listings') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-tags"></i>@if((count($user->listings->where('status',0))+count($user->listings->where('status',1))) > 0)<span class="badge badge-dark badge-sm up">{{(count($user->listings->where('status',0))+count($user->listings->where('status',1)))}}</span>@endif
+    </div>
+    <div class="quick-text">
+      {{ trans('general.listings') }}
+    </div>
+  </a>
+  {{-- Dashboard offers quick action --}}
+  <a href="{{ url('dash/offers') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-briefcase"></i>@if((count($user->offers->where('status',0)->where('declined',0)) + count($user->offers->where('status',1)->where('declined',0))) > 0)<span class="badge badge-dark badge-sm up">{{count($user->offers->where('status',0)->where('declined',0)) + count($user->offers->where('status',1)->where('declined',0))}}</span>@endif
+    </div>
+    <div class="quick-text">
+      {{ trans('general.offers') }}
+    </div>
+  </a>
+  {{-- Dashboard wishlist quick action --}}
+  <a href="{{ url('dash/wishlist') }}" class="quick-action">
+    {{-- Icon --}}
+    <div class="quick-icon">
+      <i class="fa fa-heart"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('wishlist.wishlist') }}
+    </div>
+  </a>
+  {{-- Dashboard messenger quick action --}}
+  <a href="{{ url('messages') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fas {{ Auth::user()->unreadMessagesCount()>0 ? 'fa-envelope-open' : 'fa-envelope'}}"></i>@if(Auth::user()->unreadMessagesCount()>0)<span class="badge badge-danger badge-sm up">{{Auth::user()->unreadMessagesCount()}}</span> @endif
+    </div>
+    <div class="quick-text">
+      {{ trans('messenger.messenger') }}
+    </div>
+  </a>
+  {{-- Dashboard notifications quick action --}}
+  <a href="{{ url('dash/notifications') }}" class="quick-action">
+    {{-- Icon with count --}}
+    <div class="quick-icon">
+      <i class="fa fa-bell @if(count(Auth::user()->unreadNotifications)>0) faa-shake animated @endif"></i>@if(count(Auth::user()->unreadNotifications)>0)<span class="badge badge-danger badge-sm up">{{count(Auth::user()->unreadNotifications)}}</span> @endif
+    </div>
+    <div class="quick-text">
+      {{ trans('notifications.title') }}
+    </div>
+  </a>
+  {{-- Dashboard Settings quick action --}}
+  <a href="{{ url('dash/settings') }}" class="quick-action">
+    <div class="quick-icon">
+      <i class="fa fa-wrench"></i>
+    </div>
+    <div class="quick-text">
+      {{ trans('users.dash.settings.settings') }}
+    </div>
+  </a>
+</div>
+{{-- End Quick Links --}}
+
+{{-- Start Content Tab --}}
+<div class="contenttab {{ count($user->offers) == 0 && $offers_trashed_count == 0 ? 'hidden' : '' }}">
+  <div class="tabs">
+  {{-- Active tab --}}
+  @if((count($user->listings->where('status',0))+count($user->listings->where('status',1))) != 0)
+    <a class="tab {{  Request::is('dash/listings') ? 'active' : ''}}" href="{{url('dash/listings')}}">
+      {{ trans('users.dash.active') }} <span class="tag tag-pill tag-dash">{{count($user->listings->where('status',0))+count($user->listings->where('status',1))}}</span>
+    </a>
+  @endif
+  {{-- Complete tab --}}
+  @if(count($user->listings->where('status',2)) != 0)
+  <a class="tab {{  Request::is('dash/listings/complete') ? 'active' : ''}}" href="{{url('dash/listings/complete')}}">
+    {{ trans('users.dash.complete') }} <span class="tag tag-pill tag-dash">{{count($user->listings->where('status',2))}}</span>
+  </a>
+  @endif
+  {{-- Deleted tab --}}
+  @if($offers_trashed_count != 0)
+  <a class="tab {{  Request::is('dash/listings/deleted') ? 'active' : ''}}"  href="{{url('dash/listings/deleted')}}">
+    <i class="fa fa-trash m-r-5" aria-hidden="true"></i> <span class="tag tag-pill tag-dash">{{$offers_trashed_count}}</span>
+  </a>
+  @endif
+  </div>
+</div>
+{{-- End Content Tab --}}
 
 {{ $offers->links() }}
 
