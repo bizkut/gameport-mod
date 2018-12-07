@@ -591,6 +591,7 @@
   border: 0px;
   color: #9a9a9a;
   line-height: 30px;
+  overflow: hidden;
 }
 
 .messages-input .message-input textarea:focus {
@@ -5040,8 +5041,6 @@ text-decoration: none;
 .site-menu-games ul {
   padding: 0;
   list-style-type: none;
-  max-height: 240px;
-  overflow-y: scroll;
   overflow-x: hidden;
 }
 
@@ -5064,11 +5063,6 @@ text-decoration: none;
     left: 0;
     width: 100%;
   }
-
-  .site-menu-games ul {
-    max-height: inherit;;
-  }
-
 
   .site-menu > .site-menu-item > a {
     border-radius: 0px !important;
