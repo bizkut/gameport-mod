@@ -24,6 +24,12 @@ class CreateUsersTable extends Migration
             $table->boolean('confirmed')->default(\Config::get('settings.users_confirmation') ? false : true);
             $table->double('balance', 15, 2)->default('0.00');
             $table->rememberToken();
+            $table->string('bank_firstname', 255)->nullable();
+            $table->string('bank_lastname', 255)->nullable();
+            $table->string('bank_iban', 255)->nullable();
+            $table->string('bank_swiftcode', 255)->nullable();
+            $table->string('bank_name', 255)->nullable();
+            $table->string('bank_address', 255)->nullable();
             $table->timestamp('last_activity_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

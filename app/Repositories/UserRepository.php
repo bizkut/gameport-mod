@@ -344,6 +344,29 @@ class UserRepository extends Repository
      * @return mixed
      * @throws GeneralException
      */
+    public function updateBankaccount($id, $request)
+    {
+        $user = parent::find($id);
+
+        $user->bank_firstname = $request['firstname'];
+        $user->bank_lastname = $request['lastname'];
+        $user->bank_iban     = $request['iban'];
+        $user->bank_swiftcode = $request['swiftcode'];
+        $user->bank_name = $request['bankname'];
+        $user->bank_address = $request['bankaddress'];
+
+        // show a success message
+        \Alert::success('<i class="fa fa-save m-r-5"></i>' . trans('users.alert.bankaccount_saved'))->flash();
+
+        return parent::save($user);
+    }
+
+    /**
+     * @param $id
+     * @param $input
+     * @return mixed
+     * @throws GeneralException
+     */
     public function updateLocation($id, $request)
     {
 

@@ -13,8 +13,10 @@ use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Withdrawal;
 use App\Http\Requests\Frontend\User\UpdateProfileRequest;
+use App\Http\Requests\Frontend\User\UpdateBankaccountRequest;
 use App\Http\Requests\Frontend\User\ChangePasswordRequest;
 use App\Http\Requests\WithdrawalRequest;
+use App\Http\Requests\WithdrawalBankRequest;
 use App\Repositories\UserRepository;
 use Validator;
 use Redirect;
@@ -76,6 +78,43 @@ class UserController
         }
 
         $this->user->updateProfile(auth()->id(), $request);
+        return redirect()->route('dashboard.settings');
+    }
+
+    /**
+     * BankAccount form
+     *
+     * @return view
+     */
+    public function bankaccountForm()
+    {
+        // check if user account is active
+        if (! \Auth::user()->isActive()) {
+            \Auth::logout();
+            return redirect('login')->with('error', trans('auth.deactivated'));
+        }
+
+        // Page title
+        SEO::setTitle(trans('users.dash.settings.bankaccount') . ' - ' . config('settings.page_name'));
+
+        return view('frontend.user.settings.bankaccount', ['user' => auth()->user()]);
+    }
+
+    /**
+     * BankAccount form
+     *
+     * @return view
+     */
+    public function updateBankaccount(UpdateBankaccountRequest $request)
+    {
+        // check if user account is active
+        if (! \Auth::user()->isActive()) {
+            \Auth::logout();
+            return redirect('login')->with('error', trans('auth.deactivated'));
+        }
+
+        // Page title
+        $this->user->updateBankaccount(auth()->id(), $request);
         return redirect()->route('dashboard.settings');
     }
 
@@ -453,11 +492,15 @@ class UserController
             return redirect('dash/balance');
         }
 
+        if(!config('settings.paypal')) {
+            return redirect('dash/balance/withdrawal/bank');
+        }
+
         $transactions = Transaction::where('user_id', \Auth::user()->id)->orderBy('id','desc')->get();
 
         $withdrawal = Withdrawal::where('user_id', \Auth::user()->id)->where('status', '1')->paginate('12');
 
-        return view('frontend.user.dash.withdrawal', ['withdrawal' => $withdrawal, 'transactions' => $transactions]);
+        return view('frontend.user.dash.withdrawal', ['withdrawal' => $withdrawal, 'transactions' => $transactions, 'tab' => 'paypal']);
     }
 
     /**
@@ -517,7 +560,101 @@ class UserController
         \Alert::success('<i class="fa fa-check m-r-5"></i> ' . trans('payment.withdrawal.alert.successfully') .'')->flash();
 
         return redirect('dash/balance');
+    }
 
+    /**
+     * Withdrawal Bank
+     *
+     * @param  Request $request
+     * @param  string $sort
+     * @return view
+     */
+    public function withdrawalBank()
+    {
+        // Page title
+        SEO::setTitle(trans('payment.withdrawal.withdrawal') . ' - ' . config('settings.page_name'));
+
+        // Check if logged in
+        if (!(\Auth::check())) {
+            return Redirect::to('/login');
+        }
+
+        // check if user account is active
+        if (! \Auth::user()->isActive()) {
+            \Auth::logout();
+            return redirect('login')->with('error', trans('auth.deactivated'));
+        }
+
+        // check if user has available balance
+        if ( \Auth::user()->balance <= 0) {
+            \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
+            return redirect('dash/balance');
+        }
+
+        $transactions = Transaction::where('user_id', \Auth::user()->id)->orderBy('id','desc')->get();
+
+        $withdrawal = Withdrawal::where('user_id', \Auth::user()->id)->where('status', '1')->paginate('12');
+
+        return view('frontend.user.dash.withdrawal', ['withdrawal' => $withdrawal, 'transactions' => $transactions, 'tab' => 'bank']);
+    }
+
+    /**
+     * Withdrawal dashboard
+     *
+     * @param  Request $request
+     * @param  string $sort
+     * @return view
+     */
+    public function addWithdrawalBank(WithdrawalBankRequest $request)
+    {
+        // Check if logged in
+        if (!(\Auth::check())) {
+            return Redirect::to('/login');
+        }
+
+        // check if user account is active
+        if (! \Auth::user()->isActive()) {
+            \Auth::logout();
+            return redirect('login')->with('error', trans('auth.deactivated'));
+        }
+
+        $user = \Auth::user();
+
+        // check if user have available balance
+        if ($user->balance <= 0) {
+            \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
+            return redirect('dash/balance');
+        }
+
+        $withdrawal = new Withdrawal;
+
+        $withdrawal->user_id = $user->id;
+        $withdrawal->payment_method = 'bank';
+        $withdrawal->payment_details = '';
+        $withdrawal->currency = config('settings.currency');
+        $withdrawal->total = $user->balance;
+
+        $withdrawal->save();
+
+        // remove balance from user account
+        $user->balance = 0.00;
+        $user->save();
+
+        // sale transaction
+        $withdrawal_transaction = new Transaction;
+
+        $withdrawal_transaction->type = 'withdrawal';
+        $withdrawal_transaction->item_id = $withdrawal->id;
+        $withdrawal_transaction->item_type = get_class($withdrawal);
+        $withdrawal_transaction->user_id = $user->id;
+        $withdrawal_transaction->total = $withdrawal->total;
+        $withdrawal_transaction->currency = $withdrawal->currency;
+
+        $withdrawal_transaction->save();
+
+        \Alert::success('<i class="fa fa-check m-r-5"></i> ' . trans('payment.withdrawal.alert.successfully') .'')->flash();
+
+        return redirect('dash/balance');
     }
 
     /**

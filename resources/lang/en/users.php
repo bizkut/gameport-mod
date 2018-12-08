@@ -72,6 +72,13 @@ return [
           'location_change' => 'Change location',
           'location_set' => 'Set location',
           'location_no' => 'No location set',
+          'bankaccount' => 'Bank Account',
+          'firstname' => 'First Name',
+          'lastname' => 'SurName',
+          'iban' => 'IBAN',
+          'swiftcode' => 'Swift Code',
+          'bankname' => 'Bank Name',
+          'bankaddress' => 'Bank Address',
       ],
     ],
 

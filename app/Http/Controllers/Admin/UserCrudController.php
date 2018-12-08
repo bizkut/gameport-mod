@@ -62,6 +62,36 @@ class UserCrudController extends CrudController
                 'type'  => 'email',
             ],
             [
+                'name'  => 'bank_firstname',
+                'label' => trans('users.dash.settings.firstname'),
+                'type'  => 'text',
+            ],
+            [
+                'name'  => 'bank_lastname',
+                'label' => trans('users.dash.settings.lastname'),
+                'type'  => 'text',
+            ],
+            [
+                'name'  => 'bank_iban',
+                'label' => trans('users.dash.settings.iban'),
+                'type'  => 'text',
+            ],
+            [
+                'name'  => 'bank_swiftcode',
+                'label' => trans('users.dash.settings.swiftcode'),
+                'type'  => 'text',
+            ],
+            [
+                'name'  => 'bank_name',
+                'label' => trans('users.dash.settings.bankname'),
+                'type'  => 'text',
+            ],
+            [
+                'name'  => 'bank_address',
+                'label' => trans('users.dash.settings.bankaddress'),
+                'type'  => 'textarea',
+            ],
+            [
                 'name'  => 'confirmed',
                 'label' => 'Confirmed',
                 'type'  => 'check',
@@ -105,6 +135,55 @@ class UserCrudController extends CrudController
                 'name'  => 'email',
                 'label' => trans('backpack::permissionmanager.email'),
                 'type'  => 'email',
+            ],
+            [
+                'name'  => 'bank_firstname',
+                'label' => trans('users.dash.settings.firstname'),
+                'type'  => 'text',
+                'attributes'  => array(
+                    'readonly' => ''
+                ),
+            ],
+            [
+                'name'  => 'bank_lastname',
+                'label' => trans('users.dash.settings.lastname'),
+                'type'  => 'text',
+                'attributes'  => array(
+                    'readonly' => ''
+                ),
+            ],
+            [
+                'name'  => 'bank_iban',
+                'label' => trans('users.dash.settings.iban'),
+                'type'  => 'text',
+                'attributes'  => array(
+                    'readonly' => ''
+                ),
+            ],
+            [
+                'name'  => 'bank_swiftcode',
+                'label' => trans('users.dash.settings.swiftcode'),
+                'type'  => 'text',
+                'attributes'  => array(
+                    'readonly' => ''
+                ),
+            ],
+            [
+                'name'  => 'bank_name',
+                'label' => trans('users.dash.settings.bankname'),
+                'type'  => 'text',
+                'attributes'  => array(
+                    'readonly' => ''
+                ),
+            ],
+            [
+                'name'  => 'bank_address',
+                'label' => trans('users.dash.settings.bankaddress'),
+                'type'  => 'textarea',
+                'attributes'  => array(
+                    'row' => 3,
+                    'readonly' => ''
+                ),
             ],
             [
                 'name'  => 'password',

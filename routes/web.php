@@ -248,7 +248,9 @@ Route::group(['prefix' => 'dash', 'middleware' => 'auth'], function()
     Route::get('offers/{sort?}', 'UserController@offers');
     Route::get('wishlist', 'WishlistController@index');
     Route::get('settings', 'UserController@settingsForm');
-    Route::post('settings', 'UserController@settingsSave')->name('dashboard.settings');;
+    Route::post('settings', 'UserController@settingsSave')->name('dashboard.settings');
+    Route::get('settings/bankaccount', 'UserController@bankaccountForm');
+    Route::post('settings/bankaccount', 'UserController@updateBankaccount');
     Route::get('settings/password', 'UserController@passwordForm');
     Route::post('settings/password', 'UserController@changePassword');
     Route::post('settings/location', 'UserController@locationSave');
@@ -258,6 +260,8 @@ Route::group(['prefix' => 'dash', 'middleware' => 'auth'], function()
     Route::get('balance', 'UserController@balance');
     Route::get('balance/withdrawal', 'UserController@withdrawal');
     Route::post('balance/withdrawal', 'UserController@addWithdrawal');
+    Route::get('balance/withdrawal/bank', 'UserController@withdrawalBank');
+    Route::post('balance/withdrawal/bank', 'UserController@addWithdrawalBank');
 });
 
 // Metacritic API Routes

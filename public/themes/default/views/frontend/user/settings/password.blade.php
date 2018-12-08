@@ -84,6 +84,10 @@
         <a class="tab {{  Request::is('dash/settings') ? 'active' : ''}}" href="{{url('dash/settings')}}">
           {{ trans('users.dash.settings.profile') }}
         </a>
+        {{-- BankAccount tab --}}
+        <a class="tab {{  Request::is('dash/settings/bankaccount') ? 'active' : ''}}" href="{{url('dash/settings/bankaccount')}}">
+          {{ trans('users.dash.settings.bankaccount') }}
+        </a>
         {{-- Password tab --}}
         <a class="tab {{  Request::is('dash/settings/password') ? 'active' : ''}}" href="{{url('dash/settings/password')}}">
           {{ trans('users.dash.settings.password') }}
@@ -91,7 +95,7 @@
       </div>
     </div>
     {{-- End Content Tab --}}
-  
+
     <section class="panel">
       {{-- Panel heading (Change password) --}}
       <div class="panel-heading">

@@ -84,6 +84,10 @@
       <a class="tab {{  Request::is('dash/settings') ? 'active' : ''}}" href="{{url('dash/settings')}}">
         {{ trans('users.dash.settings.profile') }}
       </a>
+      {{-- BankAccount tab --}}
+      <a class="tab {{  Request::is('dash/settings/bankaccount') ? 'active' : ''}}" href="{{url('dash/settings/bankaccount')}}">
+        {{ trans('users.dash.settings.bankaccount') }}
+      </a>
       {{-- Password tab --}}
       <a class="tab {{  Request::is('dash/settings/password') ? 'active' : ''}}" href="{{url('dash/settings/password')}}">
         {{ trans('users.dash.settings.password') }}
@@ -91,7 +95,7 @@
     </div>
   </div>
   {{-- End Content Tab --}}
-  
+
   <section class="panel">
 
     {{-- Panel heading (Profile) --}}
@@ -109,7 +113,7 @@
           <span class="input-group-addon fixed-width">
             <i class="fa fa-user" aria-hidden="true"></i>
           </span>
-          <input type="text" class="form-control rounded inline input" name="name" id="name" autocomplete="off" value="{{$user->name}}" placeholder="{{ trans('users.dash.settings.username') }}" readonly/>
+          <input type="text" class="form-control rounded inline input" name="name" id="name" autocomplete="off" value="{{$user->name}}" placeholder="{{ trans('users.dash.settings.username') }} " readonly/>
         </div>
         {{-- Profile link --}}
         <span style="opacity:0.5;"><i class="fa fa-link" aria-hidden="true"></i> {{ trans('users.dash.settings.profile_link') }} {{ $user->url }}</span>
@@ -199,8 +203,6 @@
       </div>
     </div>
     {!! Form::close() !!}
-
-
   </section>
 
 @stop

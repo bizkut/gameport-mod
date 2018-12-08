@@ -95,58 +95,79 @@
       </div>
     </div>
     {{-- End Content Tab --}}
-
+    
     <section class="panel">
-      {{-- Panel heading (Change password) --}}
+      {{-- Panel heading (Bank Account) --}}
       <div class="panel-heading">
-        <h3 class="panel-title">{{ trans('users.dash.settings.password_heading') }}</h3>
+        <h3 class="panel-title">{{ trans('users.dash.settings.bankaccount') }}</h3>
       </div>
-      {{-- Open Form for password --}}
-      {!! Form::open(array('url'=>'dash/settings/password','id'=>'form-password')) !!}
+      {{-- Open Form for BankAccount --}}
+      {!! Form::open(array('url'=>'dash/settings/bankaccount','id'=>'form-bankaccount')) !!}
       <div class="panel-body">
         <div class="input-wrapper">
-          {{-- Old password label --}}
-          <label>{{ trans('users.dash.settings.password_old') }}</label>
-          {{-- Error messages for old input --}}
-          @if($errors->has('old_password'))
-          <div class="bg-danger input-error">
-            @foreach($errors->get('old_password') as $message)
-            {{$message}}
-            @endforeach
-          </div>
-          @endif
-          {{-- Input for old password --}}
-          <div class="input-group {{$errors->has('old_password') ? 'has-error' : '' }}">
+          {{-- First Name label --}}
+          <label>{{ trans('users.dash.settings.firstname') }}</label>
+          {{-- First Name input --}}
+          <div class="input-group">
             <span class="input-group-addon fixed-width">
-              <i class="fa fa-key" aria-hidden="true"></i>
+              <i class="fa fa-user" aria-hidden="true"></i>
             </span>
-            <input id="password" type="password" class="form-control input" name="old_password" placeholder="{{ trans('users.dash.settings.password_old') }}" value="{{ old('old_password') }}">
+            <input type="text" class="form-control rounded inline input" name="firstname" id="firstname" autocomplete="off" value="{{$user->bank_firstname}}" placeholder="{{ trans('users.dash.settings.firstname') }} "/>
           </div>
         </div>
         <div class="input-wrapper">
-          {{-- New password label --}}
-          <label>{{ trans('users.dash.settings.password_new') }}</label>
-          {{-- Error messages for new input --}}
-          @if($errors->has('password'))
-          <div class="bg-danger input-error">
-            @foreach($errors->get('password') as $message)
-            {{$message}}
-            @endforeach
-          </div>
-          @endif
-          {{-- Input for new password --}}
-          <div class="m-b-10 input-group {{$errors->has('password') ? 'has-error' : '' }}">
+          {{-- Last Name label --}}
+          <label>{{ trans('users.dash.settings.lastname') }}</label>
+          {{-- Last Name input --}}
+          <div class="input-group">
             <span class="input-group-addon fixed-width">
-              <i class="fa fa-unlock-alt" aria-hidden="true"></i>
+              <i class="fa fa-user" aria-hidden="true"></i>
             </span>
-            <input id="password" type="password" class="form-control input" name="password" placeholder="{{ trans('users.dash.settings.password_new') }}" value="{{ old('password') }}">
+            <input type="text" class="form-control rounded inline input" name="lastname" id="lastname" autocomplete="off" value="{{$user->bank_lastname}}" placeholder="{{ trans('users.dash.settings.lastname') }} "/>
           </div>
-          {{-- Input for new paddword confirmation --}}
-          <div class="input-group {{$errors->has('password') ? 'has-error' : '' }}">
+        </div>
+        <div class="input-wrapper">
+          {{-- IBAN label --}}
+          <label>{{ trans('users.dash.settings.iban') }}</label>
+          {{-- IBAN input --}}
+          <div class="input-group">
             <span class="input-group-addon fixed-width">
-              <i class="fa fa-repeat" aria-hidden="true"></i>
+              <i class="fa fa-tags" aria-hidden="true"></i>
             </span>
-            <input id="password" type="password" class="form-control input" name="password_confirmation" placeholder="{{ trans('users.dash.settings.password_new_confirm') }}" value="{{ old('password_confirmation') }}">
+            <input type="text" class="form-control rounded inline input" name="iban" id="iban" autocomplete="off" value="{{$user->bank_iban}}" placeholder="{{ trans('users.dash.settings.iban') }} "/>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          {{-- Swift Code label --}}
+          <label>{{ trans('users.dash.settings.swiftcode') }}</label>
+          {{-- Swift Code input --}}
+          <div class="input-group">
+            <span class="input-group-addon fixed-width">
+              <i class="fa fa-barcode" aria-hidden="true"></i>
+            </span>
+            <input type="text" class="form-control rounded inline input" name="swiftcode" id="swiftcode" autocomplete="off" value="{{$user->bank_swiftcode}}" placeholder="{{ trans('users.dash.settings.swiftcode') }} "/>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          {{-- Bank Name label --}}
+          <label>{{ trans('users.dash.settings.bankname') }}</label>
+          {{-- Bank Name input --}}
+          <div class="input-group">
+            <span class="input-group-addon fixed-width">
+              <i class="fa fa-credit-card" aria-hidden="true"></i>
+            </span>
+            <input type="text" class="form-control rounded inline input" name="bankname" id="bankname" autocomplete="off" value="{{$user->bank_name}}" placeholder="{{ trans('users.dash.settings.bankname') }} "/>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          {{-- Bank Address label --}}
+          <label>{{ trans('users.dash.settings.bankaddress') }}</label>
+          {{-- Bank Address input --}}
+          <div class="input-group">
+            <span class="input-group-addon fixed-width">
+              <i class="fa fa-address-book" aria-hidden="true"></i>
+            </span>
+            <textarea class="form-control rounded inline input" name="bankaddress" id="bankaddress" rows="3" autocomplete="off" placeholder="{{ trans('users.dash.settings.bankaddress') }} ">{{$user->bank_address}}</textarea>
           </div>
         </div>
       </div>
@@ -156,13 +177,13 @@
         </div>
         <div>
           {{-- Save button --}}
-          <a href="javascript:void(0)" class="button" id="password-submit">
+          <a href="javascript:void(0)" class="button" id="bankaccount-submit">
             <i class="fa fa-save" aria-hidden="true"></i> {{ trans('general.save') }}
           </a>
         </div>
       </div>
       {!! Form::close() !!}
-      {{-- Close Form for password --}}
+      {{-- Close Form for bankaccount --}}
 
     </section>
 
@@ -174,10 +195,10 @@
 $(document).ready(function(){
 
   {{-- password submit --}}
-  $("#password-submit").click( function(){
-    $('#password-submit').html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
-    $('#password-submit').addClass('loading');
-    $('#form-password').submit();
+  $("#bankaccount-submit").click( function(){
+    $('#bankaccount-submit').html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
+    $('#bankaccount-submit').addClass('loading');
+    $('#form-bankaccount').submit();
   });
 
 })
