@@ -111,6 +111,81 @@
   margin-bottom: 20px;
 }
 
+.article-cover-wrapper {
+  height: auto;
+  overflow: hidden;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #000;
+}
+
+.article-cover-wrapper {
+  background-color: inherit;
+  margin: 10px;
+  margin-top: 10px;
+  margin-top: 20px;
+  border-radius: 15px;
+  position: relative;
+}
+
+.article-cover-wrapper .owl-lazy {
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+
+.article-cover-wrapper .overlay {
+  background: inherit;
+}
+
+.article-cover-wrapper .overlay {
+  display: block;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  background: -moz-linear-gradient(top, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 100%);
+  background: -webkit-linear-gradient(top, rgba(0,0,0,0) 60%,rgba(0,0,0,1) 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 60%,rgba(0,0,0,1) 100%);
+  -webkit-transition: background 0.25s linear;
+  transition: background 0.25s linear;
+}
+
+.article-cover-wrapper a.link {
+    display: block;
+    height: 100%;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.article-cover-wrapper .caption {
+  padding: 0px 10px;
+  background-color: rgba(0,0,0,0.3);
+  bottom: 0;
+}
+
+.article-cover-wrapper .post-title {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  color: #FFF;
+  font-weight: 600 !important;
+  font-size: 18px;
+  line-height: 20px;
+  display: block;
+  text-overflow: ellipsis;
+  height: 20px;
+  white-space: nowrap;
+  overflow: hidden !important;
+}
+
+.article-cover-wrapper .caption p {
+  display: block;
+  color: #E4E4E4;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255, 0.7);
+}
+
 /*------------------------------------------------------------------
 [ Payment Dashboard ]
 */

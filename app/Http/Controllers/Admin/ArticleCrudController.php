@@ -41,6 +41,10 @@ class ArticleCrudController extends CrudController
                                 'label' => 'Title',
                             ]);
         $this->crud->addColumn([
+                                'name' => 'description',
+                                'label' => 'Description',
+                            ]);
+        $this->crud->addColumn([
                                 'name' => 'featured',
                                 'label' => 'Featured',
                                 'type' => 'check',
@@ -67,6 +71,12 @@ class ArticleCrudController extends CrudController
                                 'type' => 'text',
                                 'hint' => 'Will be automatically generated from your title, if left empty.',
                                 // 'disabled' => 'disabled'
+                            ]);
+        $this->crud->addField([    // TEXT
+                                'name' => 'description',
+                                'label' => 'Description',
+                                'type' => 'text',
+                                'placeholder' => 'Your description here',
                             ]);
 
         $this->crud->addField([    // TEXT

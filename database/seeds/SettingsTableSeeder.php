@@ -1171,8 +1171,48 @@ class SettingsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => NULL,
             ),
+            82 =>
+            array (
+                'id' => 83,
+                'key' => 'articles_post',
+                'name' => 'Enable Articles Post',
+                'description' => 'articles_post',
+                'value' => '0',
+                'field' => '{"name":"value","label":"Value","type":"toggle"}',
+                'active' => 1,
+                'category' => 'article',
+                'reorder' => '1',
+                'created_at' => NULL,
+                'updated_at' => NULL,
+            ),
+            83 =>
+            array (
+                'id' => 84,
+                'key' => 'post_articles_only_featured',
+                'name' => 'Post Only Featured Articles',
+                'description' => 'post_articles_only_featured',
+                'value' => '0',
+                'field' => '{"name":"value","label":"Value","type":"toggle"}',
+                'active' => 1,
+                'category' => 'article',
+                'reorder' => '2',
+                'created_at' => NULL,
+                'updated_at' => NULL,
+            ),
+            84 =>
+            array (
+                'id' => 85,
+                'key' => 'post_articles_count',
+                'name' => 'Post Articles Count',
+                'description' => 'post_articles_count',
+                'value' => '3',
+                'field' => '{"name":"value","label":"Value","type":"number"}',
+                'active' => 1,
+                'category' => 'article',
+                'reorder' => '3',
+                'created_at' => NULL,
+                'updated_at' => NULL,
+            ),
         ));
-
-
     }
 }

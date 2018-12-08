@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Input;
 use ClickNow\Money\Money;
 use App\Models\Game;
+use App\Models\Article;
 use App\Models\Giantbomb;
 use App\Models\Platform;
 use App\Models\Genre;
@@ -75,12 +76,20 @@ class GameController
 
         // Page description
         SEO::setDescription(trans('general.description.games_all', ['games_count' => $games->total(), 'page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
-
+        
+        $articles = [];
+        if (Config::get('settings.articles_post') && Config::get('settings.post_articles_count')) {
+            $articles = Article::where('status', 'PUBLISHED');
+            if (Config::get('settings.post_articles_only_featured')) {
+                $articles = $articles->where('featured', '1');
+            }
+            $articles = $articles->orderBy('updated_at', 'desc')->limit(Config::get('settings.post_articles_count'))->get();
+        }
         // Check if ajax request
         if (Request::ajax()) {
-            return view('frontend.game.ajax.index', ['games' => $games]);
+            return view('frontend.game.ajax.index', ['games' => $games, 'articles' => $articles]);
         } else {
-            return view('frontend.game.index', ['games' => $games]);
+            return view('frontend.game.index', ['games' => $games, 'articles' => $articles]);
         }
     }
 
@@ -430,17 +439,17 @@ class GameController
             $data_meta = array(
                 'game_id' => $game_id,
                 'name' => $json_results->name,
-      	        'score' => isset($json_results->score) && $json_results->score != '' ? $json_results->score : NULL,
-      	        'userscore' =>  isset($json_results->userscore) ? $json_results->userscore*10 : NULL,
+                'score' => isset($json_results->score) && $json_results->score != '' ? $json_results->score : NULL,
+                'userscore' =>  isset($json_results->userscore) ? $json_results->userscore*10 : NULL,
                 'thumbnail' => $json_results->thumbnail,
                 'summary' => $json_results->summary,
                 'platform' => $json_results->platform,
                 'genre' => json_encode($json_results->genre),
-      	        'publisher' => $json_results->publisher,
-      	        'developer' => $json_results->developer,
+                'publisher' => $json_results->publisher,
+                'developer' => $json_results->developer,
                 'rating' => $json_results->rating,
                 'release_date' => $unknown_release ? (date('Y') + 1) . '-01-01' : $json_results->rlsdate,
-      	        'url' => $json_results->url
+                'url' => $json_results->url
             );
 
             // Insert Data in Table
@@ -766,7 +775,7 @@ class GameController
 
             return response()->json($data);
         }
-  	}
+    }
 
     /**
      * Refresh metacritic data for game
@@ -868,7 +877,7 @@ class GameController
 
         // Check if user can edit games
         if (!(\Auth::user()->can('edit_games'))) {
-	         return abort('403');
+             return abort('403');
         }
 
         // Ignore user aborts and allow the script
@@ -1139,7 +1148,7 @@ class GameController
         }
 
         // show a success message
-    		\Alert::success('<i class="fa fa-save m-r-5"></i> ' . $game->name . ' Giantbomb ID successfully changed!')->flash();
+            \Alert::success('<i class="fa fa-save m-r-5"></i> ' . $game->name . ' Giantbomb ID successfully changed!')->flash();
         return Redirect::to(url($game->url_slug));
     }
 
