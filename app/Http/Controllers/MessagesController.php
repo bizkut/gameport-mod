@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use App\Notifications\MessengerNew;
+use App\Models\Emotical;
 use Redirect;
 use SEO;
 
@@ -77,8 +78,14 @@ class MessagesController extends Controller
 
         $messages = $thread->messages()->latest()->paginate(32);
 
+        $emoticals = array();
+        $emotical_result = Emotical::where('status', 'PUBLISHED')->get();
+        foreach ($emotical_result as $emotical) {
+            $emoticals[$emotical_result->string] = '<img class="emotical-small" src="' . $emotical_result->image . '">';
+        }
+
         $thread->markAsRead($userId);
-        return view('frontend.messenger.show', ['thread' => $thread, 'messages' => $messages]);
+        return view('frontend.messenger.show', ['thread' => $thread, 'messages' => $messages, 'emoticals' => $emoticals]);
     }
     /**
      * Check for new messages in the thread

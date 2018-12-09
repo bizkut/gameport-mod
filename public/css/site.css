@@ -3682,6 +3682,11 @@ text-decoration: none;
   overflow-x: hidden;
 }
 
+.site-menu-games ul {
+  padding: 0;
+  list-style-type: none;
+  overflow-x: hidden;
+}
 
 @media (min-width: 992px) and (max-width: 1199px) {
   .site-menu-games {

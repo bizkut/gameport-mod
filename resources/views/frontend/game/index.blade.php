@@ -17,6 +17,18 @@
     @include('frontend.ads.google')
   @endif
 
+  @if(count($articles))
+    {{-- Start Articles wrapper --}}
+    <div id="articles-wrapper">
+      <div class="row">
+        @forelse ($articles as $article)
+          @include('frontend.blog.inc.card')
+        @empty
+        @endforelse
+      </div>
+    </div>
+  @endif
+
   {{-- Game title --}}
   <div class="panels-title border-bottom flex-center-space">
     {{-- Title --}}

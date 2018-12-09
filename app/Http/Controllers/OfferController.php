@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Report;
 use App\Models\Payment;
 use App\Models\Transaction;
+use App\Models\Emotical;
 use App\Notifications\OfferNew;
 use App\Notifications\OfferDeleted;
 use App\Notifications\OfferStatus;
@@ -590,7 +591,13 @@ class OfferController
         $thread = Thread::findOrFail($offer->thread_id);
         $thread->markAsRead(Auth::user()->id);
 
-        return view('frontend.offer.chat', ['offer' => $offer, 'listing' => $listing, 'thread' => $thread]);
+        $emoticals = array();
+        $emotical_result = Emotical::where('status', 'PUBLISHED')->get();
+        foreach ($emotical_result as $emotical) {
+            $emoticals[$emotical->string] = '<img class="emotical-small" src="' . $emotical->image . '">';
+        }
+
+        return view('frontend.offer.chat', ['offer' => $offer, 'listing' => $listing, 'thread' => $thread, 'emoticals' => $emoticals]);
     }
 
     /**
