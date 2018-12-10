@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Emotical;
 use Carbon\Carbon;
 use Cmgmyr\Messenger\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use App\Notifications\MessengerNew;
-use App\Models\Emotical;
 use Redirect;
 use SEO;
 
@@ -81,9 +81,9 @@ class MessagesController extends Controller
         $emoticals = array();
         $emotical_result = Emotical::where('status', 'PUBLISHED')->get();
         foreach ($emotical_result as $emotical) {
-            $emoticals[$emotical_result->string] = '<img class="emotical-small" src="' . $emotical_result->image . '">';
+            $emoticals[$emotical->string] = '<img class="emotical-small" src="' . $emotical->image . '">';
         }
-
+        
         $thread->markAsRead($userId);
         return view('frontend.messenger.show', ['thread' => $thread, 'messages' => $messages, 'emoticals' => $emoticals]);
     }

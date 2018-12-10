@@ -12,6 +12,7 @@ use App\Models\Giantbomb;
 use App\Models\Platform;
 use App\Models\Genre;
 use GuzzleHttp\Client;
+use App\Models\User;
 use Searchy;
 use Redirect;
 use Request;

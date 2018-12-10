@@ -116,7 +116,5 @@ class PermissionsTableSeeder extends Seeder
                 'updated_at' => '2017-01-21 23:17:30',
             ),
         ));
-
-
     }
 }

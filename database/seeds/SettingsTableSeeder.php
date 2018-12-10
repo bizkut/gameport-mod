@@ -1212,7 +1212,6 @@ class SettingsTableSeeder extends Seeder
                 'reorder' => '3',
                 'created_at' => NULL,
                 'updated_at' => NULL,
-            ),
-        ));
+            )
     }
 }

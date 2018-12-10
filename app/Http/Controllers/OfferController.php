@@ -596,7 +596,7 @@ class OfferController
         foreach ($emotical_result as $emotical) {
             $emoticals[$emotical->string] = '<img class="emotical-small" src="' . $emotical->image . '">';
         }
-
+        
         return view('frontend.offer.chat', ['offer' => $offer, 'listing' => $listing, 'thread' => $thread, 'emoticals' => $emoticals]);
     }
 
