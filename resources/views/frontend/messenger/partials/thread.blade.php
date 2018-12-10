@@ -1,4 +1,4 @@
-<li class="list-group-item" id="thread-{{$thread->id}}">
+<li class="list-group-item item{{$index}}" id="thread-{{$thread->id}}">
   <div class="flex-center">
     {{-- User Avatar --}}
     <span class="avatar @if($thread->otherParticipant()->isOnline()) avatar-online @else avatar-offline @endif m-r-10 no-flex-shrink">

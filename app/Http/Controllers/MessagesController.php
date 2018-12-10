@@ -37,11 +37,19 @@ class MessagesController extends Controller
         // SEO Page Title
         SEO::setTitle(trans('messenger.messenger'). ' - ' . config('settings.page_name') . ' » ' . config('settings.sub_title'));
 
+        $colors = array();
+        $count = 10;
+        if ( config('settings.messenger_color_counts') ) {
+            $count = config('settings.messenger_color_counts') > 10 ? 10 : config('settings.messenger_color_counts');
+            for ($index = 1; $index <= $count; $index++) {
+                $colors = array_push($colors, config('settings.messenger' . $index . '_color'));
+            }
+        }
 
         if ($threads->isEmpty()) {
             return view('frontend.messenger.no-threads');
         } else {
-            return view('frontend.messenger.index', ['threads' => $threads]);
+            return view('frontend.messenger.index', ['threads' => $threads, 'colors' => $colors, 'count' => $count]);
         }
     }
     /**

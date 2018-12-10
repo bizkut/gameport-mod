@@ -216,16 +216,6 @@
   margin-bottom: 80px;
 }
 
-.page-aside .list-group .new-message .btn {
-  border-radius: 0px 0px 0px 50px;
-}
-
-@media (max-width: 767px) {
-  .page-aside .list-group .new-message .btn {
-    border-radius: 0px 0px 50px 0px;
-  }
-}
-
 .page-aside .list-group-item .profile-name {
   font-size: 16px;
   line-height: 16px;
@@ -249,7 +239,6 @@
 .page-aside .list-group-item {
   padding: 15px;
   margin-bottom: 5px;
-  border-radius: 50px 0px 0px 50px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -395,10 +384,6 @@
 
   .messages .page-aside.open .page-aside-inner {
     opacity: 1;
-  }
-
-  .page-aside .list-group-item {
-    border-radius: 0px 50px 50px 0px;
   }
 
   .site-navbar-collapse-show .page-aside {

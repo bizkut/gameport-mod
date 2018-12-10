@@ -21,6 +21,7 @@
     <li><a href="{{ url(config('backpack.base.route_prefix', 'admin').'/settings/comment') }}"><i class="fa fa-comments"></i> <span>Comment</span></a></li>
     <li><a href="{{ url(config('backpack.base.route_prefix', 'admin').'/settings/notification') }}"><i class="fa fa-bell"></i> <span>Notifications</span></a></li>
     <li><a href="{{ url(config('backpack.base.route_prefix', 'admin').'/settings/article') }}"><i class="fa fa-newspaper-o"></i> <span>News</span></a></li>
+    <li><a href="{{ url(config('backpack.base.route_prefix', 'admin').'/settings/messenger') }}"><i class="fa fa-envelope"></i> <span>Messenger</span></a></li>
   </ul>
 </li>
 @endcan

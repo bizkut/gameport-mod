@@ -23,7 +23,13 @@
                 <ul class="list-group">
                   {{-- New message button --}}
                   <li class="new-message m-b-5"><a href="javascript:void(0)" data-toggle="modal" data-target="#NewMessage" class="btn btn-primary btn-block "><i class="fas fa-envelope-open m-r-5"></i>{{ trans('messenger.new_message') }}</a></li>
-                  @each('frontend.messenger.partials.thread', $threads, 'thread', 'frontend.messenger.partials.no-threads')
+                  @php $index = 0; @endphp
+                  @forelse($threads as $thread)
+                    @include('frontend.messenger.partials.thread')
+                    @php $index++; $index = $index % $count + 1; @endphp
+                  @empty
+                    @include('frontend.messenger.partials.no-threads')
+                  @endforelse
                   {{--<li class="list-gradient"></li>--}}
                 </ul>
               </div>
@@ -67,6 +73,22 @@
 
 @include('frontend.messenger.partials.modal-message')
 
+@stop
+
+@section('before-scripts')
+<style type="text/css">
+    @for($color_index = 0; $color_index < $count; $color_index++)
+        .page-aside .list-group-item.item{{$color_index}} {
+            background-color: {{ $colors[$color_index] }};
+        }
+        .page-aside .list-group-item.item{{$color_index}}:hover {
+            background-color: {{ $colors[0] }};
+        }
+    @endfor
+    .page-aside .list-group-item.active {
+        background-color: {{ $colors[1] }};
+    }
+</style>
 @stop
 
 @section('after-scripts')
