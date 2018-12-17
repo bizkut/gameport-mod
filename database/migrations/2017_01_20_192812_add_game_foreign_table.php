@@ -16,6 +16,7 @@ class AddGameForeignTable extends Migration
         Schema::table('games', function (Blueprint $table) {
           $table->foreign('metacritic_id')->references('id')->on('games_metacritic');
           $table->foreign('giantbomb_id')->references('id')->on('games_giantbomb');
+          $table->foreign('category_id')->references('id')->on('product_categories');
           $table->foreign('platform_id')->references('id')->on('platforms');
           $table->foreign('genre_id')->references('id')->on('genres');
         });

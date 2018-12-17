@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Listing;
 use App\Models\ListingImage;
 use App\Models\Game;
+use App\Models\ProductCategory;
 use App\Models\Platform;
 use App\Models\Digital;
 use App\Models\User;
@@ -269,7 +270,10 @@ class ListingController
 
         $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
 
-        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all(), 'user' => $user]);
+        $categories = ProductCategory::where('status', 'PUBLISHED')->where(function($q) {
+            $q->whereIn('parent_id', [null, ''])->orWhere('parent_id', '0');})->get();
+
+        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all(), 'user' => $user, 'categories' => $categories]);
     }
 
     /**

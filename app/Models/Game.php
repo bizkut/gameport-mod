@@ -24,7 +24,7 @@ class Game extends Model
     protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['name','description','cover_generator','cover','release_date','publisher','developer','pegi','platform_id','genre_id'];
+    protected $fillable = ['name','description','cover_generator','cover','release_date','publisher','developer','pegi','category_id','platform_id','genre_id'];
     // protected $hidden = [];
     protected $dates = ['release_date','deleted_at'];
 
@@ -52,6 +52,11 @@ class Game extends Model
     public function platform()
     {
         return $this->belongsTo('App\Models\Platform');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo('App\Models\ProductCategory');
     }
 
     public function genre()
@@ -352,7 +357,12 @@ class Game extends Model
     */
     public function getUrlSlugAttribute()
     {
-        return url('games/' . str_slug($this->name) . '-' . $this->platform->acronym . '-' . $this->id);
+        if ($this->category_id) {
+            return url('games/' . str_slug($this->name) . '-' . $this->category->acronym . '-' . $this->id);
+        }
+        if ($this->platform_id) {
+            return url('games/' . str_slug($this->name) . '-' . $this->platform->acronym . '-' . $this->id);
+        }
     }
 
 

@@ -24,6 +24,7 @@ class CreateGamesTable extends Migration
             $table->enum('pegi', ['3', '7', '12', '16', '18'])->nullable();
             $table->text('tags')->nullable();
             $table->string('source_name')->nullable();
+            $table->integer('category_id')->nullable();
             $table->integer('metacritic_id')->nullable()->unsigned();
             $table->integer('giantbomb_id')->nullable()->unsigned();
             $table->integer('platform_id')->unsigned();

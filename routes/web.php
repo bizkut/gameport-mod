@@ -70,6 +70,12 @@ Route::group(['prefix' => config('backpack.base.route_prefix', 'admin'), 'middle
         CRUD::resource('digital', 'Admin\DigitalCrudController');
     });
 
+    Route::group(['middleware' => ['permission:edit_products']], function()
+    {
+        CRUD::resource('product', 'Admin\ProductCrudController');
+        CRUD::resource('procategory', 'Admin\ProductCategoryCrudController');
+    });
+
     Route::group(['middleware' => ['permission:edit_listings']], function()
     {
         CRUD::resource('listing', 'Admin\ListingCrudController');
