@@ -138,6 +138,41 @@
         </div>
       </div>
       <div class="input-wrapper">
+        {{-- Userdescription label --}}
+        <label>{{ trans('users.dash.settings.description') }}</label>
+        {{-- Userdescription input --}}
+        <div class="input-group">
+          <span class="input-group-addon fixed-width">
+            <i class="fa fa-info" aria-hidden="true"></i>
+          </span>
+          <input type="text" class="form-control rounded inline input" name="description" id="description" autocomplete="off" value="{{$user->description}}" placeholder="{{ trans('users.dash.settings.description') }} "/>
+        </div>
+        {{-- Profile link --}}
+        <span style="opacity:0.5;"> {{ trans('users.dash.settings.description_max') }} </span>
+      </div>
+      <div class="input-wrapper">
+        {{-- Facebooklink label --}}
+        <label>{{ trans('users.dash.settings.facebook_link') }}</label>
+        {{-- Facebooklink input --}}
+        <div class="input-group">
+          <span class="input-group-addon fixed-width">
+            <i class="fab fa-facebook-square" aria-hidden="true"></i>
+          </span>
+          <input type="text" class="form-control rounded inline input" name="facebook_link" id="facebook_link" autocomplete="off" value="{{$user->facebook_link}}" placeholder="{{ trans('users.dash.settings.facebook_link') }} "/>
+        </div>
+      </div>
+      <div class="input-wrapper">
+        {{-- Twitterlink label --}}
+        <label>{{ trans('users.dash.settings.twitter_link') }}</label>
+        {{-- Twitterlink input --}}
+        <div class="input-group">
+          <span class="input-group-addon fixed-width">
+            <i class="fab fa-facebook-square" aria-hidden="true"></i>
+          </span>
+          <input type="text" class="form-control rounded inline input" name="twitter_link" id="twitter_link" autocomplete="off" value="{{$user->twitter_link}}" placeholder="{{ trans('users.dash.settings.twitter_link') }} "/>
+        </div>
+      </div>
+      <div class="input-wrapper">
         {{-- Change profile image label --}}
         <label>{{ trans('users.dash.settings.change_avatar') }}</label>
         {{-- Error messages for image --}}

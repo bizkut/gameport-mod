@@ -17,7 +17,11 @@ $listing = $listings->where('id', $notification->data['listing_id'] )->first();
   <div class="info">
     {{-- Notification text --}}
     <h1>
+      @if($listing->game->platform)
       {{ trans('notifications.push.price_alert_message', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->platform->name, 'price' => $listing->price_formatted]) }}
+      @elseif($listing->game->category)
+      {{ trans('notifications.push.price_alert_message', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->category->name, 'price' => $listing->price_formatted]) }}
+      @endif
     </h1>
     {{-- Notificaion icon and date --}}
     <p><i class="fas fa-exclamation-triangle"></i> {{$notification->created_at->diffForHumans()}}</p>

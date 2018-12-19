@@ -33,7 +33,11 @@
   <div class="panels-title border-bottom flex-center-space">
     {{-- Title --}}
     <div>
+      @if(isset($product))
+      <i class="fab fa-product-hunt" aria-hidden="true"></i> {{ trans('games.overview.all_products') }}
+      @else
       <i class="fa fa-gamepad" aria-hidden="true"></i> {{ trans('games.overview.all_games') }}
+      @endif
     </div>
     {{-- Current page + page count --}}
     <div class="o-50">
@@ -65,6 +69,24 @@
         {{-- Start sort options --}}
         <div>
             {{-- Sort order button (desc / asc) --}}
+            @if(isset($product))
+            <a id="order-direction" href="{{ url('products/order') }}/{{ session()->has('productsOrder') ? session()->get('productsOrder') : 'release_date' }}/{{  session()->has('productsOrderByDesc') ? (session()->get('productsOrderByDesc') ? 'asc' : 'desc') : 'asc' }}" class="btn btn-dark" style="vertical-align: inherit;">
+                <i class="fa fa-sort-amount-{{ session()->has('productsOrderByDesc') ? (session()->get('productsOrderByDesc') ? 'up' : 'down') : 'up' }}" aria-hidden="true"></i>
+            </a>
+            {{-- Sort dropdown --}}
+            <div class="m-l-5 inline-block">
+                <select id="order_by" class="form-control select" style="height: 33px !important;">
+                    {{-- Sort by --}}
+                    <option disabled>{{ trans('general.sortfilter.sort_by') }}</option>
+                    {{-- Release option --}}
+                    <option value="{{ url('products/order/release_date') }}" {{ session()->has('gamesOrder') ? (session()->get('gamesOrder') == 'created_at' ? 'selected' : '') : '' }}>{{ trans('general.sortfilter.sort_release') }}</option>
+                    {{-- Listings option --}}
+                    <option value="{{ url('products/order/listings') }}" {{ session()->has('gamesOrder') ? (session()->get('gamesOrder') == 'listings' ? 'selected' : '') : '' }}>{{ trans('general.sortfilter.sort_listings') }}</option>
+                    {{-- Popularity option --}}
+                    <option value="{{ url('products/order/popularity') }}" {{ session()->has('gamesOrder') ? (session()->get('gamesOrder') == 'popularity' ? 'selected' : '') : '' }}>{{ trans('general.sortfilter.sort_popularity') }}</option>
+                </select>
+            </div>
+            @else
             <a id="order-direction" href="{{ url('games/order') }}/{{ session()->has('gamesOrder') ? session()->get('gamesOrder') : 'release_date' }}/{{  session()->has('gamesOrderByDesc') ? (session()->get('gamesOrderByDesc') ? 'asc' : 'desc') : 'asc' }}" class="btn btn-dark" style="vertical-align: inherit;">
                 <i class="fa fa-sort-amount-{{ session()->has('gamesOrderByDesc') ? (session()->get('gamesOrderByDesc') ? 'up' : 'down') : 'up' }}" aria-hidden="true"></i>
             </a>
@@ -83,6 +105,7 @@
                     <option value="{{ url('games/order/popularity') }}" {{ session()->has('gamesOrder') ? (session()->get('gamesOrder') == 'popularity' ? 'selected' : '') : '' }}>{{ trans('general.sortfilter.sort_popularity') }}</option>
                 </select>
             </div>
+            @endif
         </div>
         {{-- End sort options --}}
     </div>
@@ -179,7 +202,11 @@
 
   {{-- Start Breadcrumbs --}}
   @section('breadcrumbs')
+  @if(isset($product))
+  {!! Breadcrumbs::render('products') !!}
+  @else
   {!! Breadcrumbs::render('games') !!}
+  @endif
   @endsection
   {{-- End Breadcrumbs --}}
 

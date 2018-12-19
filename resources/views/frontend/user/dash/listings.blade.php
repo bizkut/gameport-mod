@@ -11,28 +11,6 @@
       <span class="title"><i class="fa fa-tags"></i> {{ trans('general.listings') }}</span>
     </div>
 
-    <div class="tabs">
-      {{-- Active tab --}}
-      @if((count($user->listings->where('status',0))+count($user->listings->where('status',1))) != 0)
-      <a class="tab {{  Request::is('dash/listings') ? 'active' : ''}}" href="{{url('dash/listings')}}">
-        {{ trans('users.dash.active') }} <span class="tag tag-pill tag-dash">{{count($user->listings->where('status',0))+count($user->listings->where('status',1))}}</span>
-      </a>
-      @endif
-      {{-- Complete tab --}}
-      @if(count($user->listings->where('status',2)) != 0)
-      <a class="tab {{  Request::is('dash/listings/complete') ? 'active' : ''}}" href="{{url('dash/listings/complete')}}">
-        {{ trans('users.dash.complete') }} <span class="tag tag-pill tag-dash">{{count($user->listings->where('status',2))}}</span>
-      </a>
-      @endif
-      {{-- Deleted tab --}}
-      @if($listings_trashed_count != 0)
-      <a class="tab {{  Request::is('dash/listings/deleted') ? 'active' : ''}}"  href="{{url('dash/listings/deleted')}}">
-        <i class="fa fa-trash m-r-5" aria-hidden="true"></i> <span class="tag tag-pill tag-dash">{{$listings_trashed_count}}</span>
-      </a>
-      @endif
-
-    </div>
-
   </div>
 
 @stop
@@ -113,7 +91,7 @@
 {{-- End Quick Links --}}
 
 {{-- Start Content Tab --}}
-<div class="contenttab {{ $user->listings->count() == 0 && $listings_trashed_count == 0  ?'hidden' : '' }}">
+<div class="contenttab {{ $user->listings->count() == 0 && $listings_trashed_count == 0  ? 'hidden' : '' }}">
   <div class="tabs">
   {{-- Active tab --}}
   @if((count($user->listings->where('status',0))+count($user->listings->where('status',1))) != 0)
@@ -157,7 +135,11 @@
           {{-- Game Name + platform --}}
           <div>
             <div class="title">{{ $listing->game->name }}</div>
+            @if($listing->game->platform)
             <span class="platform-label" style="background-color:{{ $listing->game->platform->color }};"> {{ $listing->game->platform->name }} </span>
+            @elseif($listing->game->category)
+            <span class="platform-label" style="background-color:{{ $listing->game->category->color }};"> {{ $listing->game->category->name }} </span>
+            @endif
           </div>
         </div>
         <div class="flex-center no-flex-shrink">
@@ -249,7 +231,11 @@
                 <div>
                   {{-- Game title & platform / icon when suggestion --}}
                   <div class="offer-game-title">@if(!$offer->trade_from_list)<span class="m-r-5"><i class="fa fa-retweet" aria-hidden="true"></i></span>@endif{{ $offer->game->name }}</div>
+                  @if($offer->game->platform)
                   <span class="platform-label" style="background-color:{{ $offer->game->platform->color }};">{{ $offer->game->platform->name }} </span>
+                  @elseif($offer->game->category)
+                  <span class="platform-label" style="background-color:{{ $offer->game->category->color }};">{{ $offer->game->category->name }} </span>
+                  @endif
                 </div>
               </div>
               @endif

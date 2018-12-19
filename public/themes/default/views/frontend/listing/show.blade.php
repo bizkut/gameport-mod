@@ -50,13 +50,21 @@
         </a>
         {{-- Twitter share --}}
         @if($listing->sell == 1)
+        @if($game->platform)
         <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_listing_buy', ['game_name' => $game->name, 'platform' => $game->platform->name, 'price' => $listing->price_formatted])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+        @elseif($game->category)
+        <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_listing_buy', ['game_name' => $game->name, 'platform' => $game->category->name, 'price' => $listing->price_formatted])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+        @endif
           <i class="icon fab fa-twitter" aria-hidden="true"></i>
         </a>
         {{-- Twitter share with text for trade --}}
         @else
+        @if($game->platform)
         <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_listing_trade', ['game_name' => $game->name, 'platform' => $game->platform->name])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
-          <i class="icon fab fa-twitter" aria-hidden="true"></i>
+        @elseif($game->category)
+        <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_listing_trade', ['game_name' => $game->name, 'platform' => $game->category->name])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+        @endif
+        <i class="icon fab fa-twitter" aria-hidden="true"></i>
         </a>
         @endif
         {{-- Google plus share --}}
@@ -105,9 +113,11 @@
 
         @if($listing->digital)
         {{-- Digital ditributor --}}
+        @if($listing->game->platform)
         <div class="value">
           <i class="fa fa-download" aria-hidden="true"></i> {{$listing->game->platform->digitals->where('id',$listing->digital)->first()->name}}
         </div>
+        @endif
         @else
         {{-- Condition --}}
         <div class="value">
@@ -240,6 +250,7 @@
                 {{-- Generated game cover with platform on top --}}
                 @if($trade_game->cover_generator)
                   <div class="lazy game-cover gen"  data-original="{{$trade_game->image_cover}}"></div>
+                  @if($trade_game->platform)
                   <div class="game-platform-gen" style="background-color: {{$trade_game->platform->color}}; text-align: {{$trade_game->platform->cover_position}};">
                     {{-- Check if platform logo setting is enabled --}}
                     @if( config('settings.platform_logo') )
@@ -248,6 +259,16 @@
                       <span>{{$trade_game->platform->name}}</span>
                     @endif
                   </div>
+                  @elseif($trade_game->category)
+                  <div class="game-platform-gen" style="background-color: {{$trade_game->category->color}}; text-align: {{$trade_game->category->cover_position}};">
+                    {{-- Check if category logo setting is enabled --}}
+                    @if( config('settings.platform_logo') )
+                      <img src="{{ asset('logos/' . $trade_game->category->acronym . '_tiny.png/') }}" alt="{{$trade_game->category->name}} Logo">
+                    @else
+                      <span>{{$trade_game->category->name}}</span>
+                    @endif
+                  </div>
+                  @endif
                 {{-- Normal game cover --}}
                 @else
                   <div class="lazy game-cover"  data-original="{{$trade_game->image_cover}}"></div>
@@ -310,9 +331,15 @@
                       <span class="title">
                         <strong>{{$game->name}}</strong>
                       </span>
+                      @if($game->platform)
                       <span class="platform" style="background-color:{{$game->platform->color}};">
                         {{$game->platform->name}}
                       </span>
+                      @elseif($game->category)
+                      <span class="platform" style="background-color:{{$game->category->color}};">
+                        {{$game->category->name}}
+                      </span>
+                      @endif
                     </div>
                   </div>
                   {{-- End Game Info --}}
@@ -349,9 +376,15 @@
                       <span class="title">
                         <strong>{{$trade_game->name}}</strong>
                       </span>
+                      @if($game->platform)
                       <span class="platform" style="background-color:{{$trade_game->platform->color}};">
                         {{$trade_game->platform->name}}
                       </span>
+                      @elseif($game->category)
+                      <span class="platform" style="background-color:{{$trade_game->category->color}};">
+                        {{$trade_game->category->name}}
+                      </span>
+                      @endif
                     </div>
                     <div>
                       <span class="avatar cover trade">
@@ -453,9 +486,15 @@
                       <span class="title">
                         <strong>{{$game->name}}</strong>
                       </span>
+                      @if($game->platform)
                       <span class="platform" style="background-color:{{$game->platform->color}};">
                         {{$game->platform->name}}
                       </span>
+                      @elseif($game->category)
+                      <span class="platform" style="background-color:{{$game->category->color}};">
+                        {{$game->category->name}}
+                      </span>
+                      @endif
                     </div>
                   </div>
                   {{-- End Game Info --}}
@@ -533,6 +572,9 @@
                 {{-- User Name --}}
                 <span class="profile-name small">
                   {{$listing->user->name}}
+                </span>
+                <span class="profile-description small">
+                  {!! str_limit(strip_tags($listing->user->description), $limit = 20, $end = '...') !!}
                 </span>
                 {{-- User Location --}}
                 <span class="profile-location small">
@@ -704,9 +746,15 @@
                   <span class="title">
                     <strong>{{$game->name}}</strong>
                   </span>
+                  @if($game->platform)
                   <span class="platform" style="background-color:{{$game->platform->color}};">
                     {{$game->platform->name}}
                   </span>
+                  @elseif($game->category)
+                  <span class="platform" style="background-color:{{$game->category->color}};">
+                    {{$game->category->name}}
+                  </span>
+                  @endif
                 </div>
               </div>
               {{-- End Game Details --}}

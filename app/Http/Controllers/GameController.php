@@ -9,6 +9,7 @@ use ClickNow\Money\Money;
 use App\Models\Game;
 use App\Models\Article;
 use App\Models\Giantbomb;
+use App\Models\ProductCategory;
 use App\Models\Platform;
 use App\Models\Genre;
 use GuzzleHttp\Client;
@@ -34,18 +35,20 @@ class GameController
     {
         // Games query
         $games = Game::query();
-
+        
         // Order - default order is created_at
         $games_order = session()->has('gamesOrder') ? session()->get('gamesOrder') : 'release_date';
-
+        
         // Platform filters
         if (session()->has('listingsPlatformFilter')) {
             $games = $games->whereIn('platform_id', session()->get('listingsPlatformFilter'));
         }
-
+        
+        $games = $games->where('platform_id', '!=', Null);
+        
         // Load other tables
-        $games = $games->with('platform','giantbomb','listingsCount','wishlistCount','metacritic');
-
+        $games = $games->with('platform','category','giantbomb','listingsCount','wishlistCount','metacritic');
+        
         // Order direction - default is asc
         // Order by metascore
         if ($games_order == 'metascore') {
@@ -60,21 +63,21 @@ class GameController
         } else {
             $games = $games->orderBy($games_order, session()->has('gamesOrderByDesc') && session()->get('gamesOrderByDesc') ? 'asc' : 'desc');
         }
-
+        
         // Paginate games results
         $games = $games->paginate('36');
-
+        
         // Get the current page from the url if it's not set default to 1
         $page = Input::get('page', 0);
-
+        
         // Redirect to first page if page from the get request don't exist
         if ($games->lastPage() < $page) {
             return redirect('games');
         }
-
+        
         // Page title
         SEO::setTitle(trans('general.title.games_all', ['page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
-
+        
         // Page description
         SEO::setDescription(trans('general.description.games_all', ['games_count' => $games->total(), 'page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
         
@@ -95,6 +98,77 @@ class GameController
     }
 
     /**
+     * Index all games
+     *
+     * @return Response
+     */
+    public function indexProduct()
+    {
+        // Games query
+        $games = Game::query();
+        
+        // Order - default order is created_at
+        $games_order = session()->has('productsOrder') ? session()->get('productsOrder') : 'release_date';
+        
+        // Platform filters
+        if (session()->has('listingsCategoryFilter')) {
+            $games = $games->whereIn('category_id', session()->get('listingsCategoryFilter'));
+        }
+
+        $games = $games->where('category_id', '!=', Null);
+        
+        // Load other tables
+        $games = $games->with('platform','category','giantbomb','listingsCount','wishlistCount','metacritic');
+        
+        // Order direction - default is asc
+        // Order by metascore
+        if ($games_order == 'metascore') {
+            //$games = $games->join('games_metacritic', 'games.id', 'games_metacritic.game_id')->orderBy('games_metacritic.score', session()->has('gamesOrderByDesc') && session()->get('gamesOrderByDesc') ? 'asc' : 'desc')->select('games.*');
+        // Order by listings count
+        } elseif($games_order == 'listings') {
+            $games = $games->withCount('listings')->orderBy('listings_count', session()->has('productsOrderByDesc') && session()->get('productsOrderByDesc') ? 'asc' : 'desc');
+        // Order by popularity
+        } elseif($games_order == 'popularity') {
+            $games = $games->withCount('heartbeat')->orderBy('heartbeat_count', session()->has('productsOrderByDesc') && session()->get('productsOrderByDesc') ? 'asc' : 'desc');
+        // default order
+        } else {
+            $games = $games->orderBy($games_order, session()->has('productsOrderByDesc') && session()->get('productsOrderByDesc') ? 'asc' : 'desc');
+        }
+        
+        // Paginate games results
+        $games = $games->paginate('36');
+        
+        // Get the current page from the url if it's not set default to 1
+        $page = Input::get('page', 0);
+        
+        // Redirect to first page if page from the get request don't exist
+        if ($games->lastPage() < $page) {
+            return redirect('games');
+        }
+        
+        // Page title
+        SEO::setTitle(trans('general.title.games_all', ['page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
+        
+        // Page description
+        SEO::setDescription(trans('general.description.games_all', ['games_count' => $games->total(), 'page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
+        
+        $articles = [];
+        if (Config::get('settings.articles_post') && Config::get('settings.post_articles_count')) {
+            $articles = Article::where('status', 'PUBLISHED');
+            if (Config::get('settings.post_articles_only_featured')) {
+                $articles = $articles->where('featured', '1');
+            }
+            $articles = $articles->orderBy('updated_at', 'desc')->limit(Config::get('settings.post_articles_count'))->get();
+        }
+        // Check if ajax request
+        if (Request::ajax()) {
+            return view('frontend.game.ajax.index', ['games' => $games, 'articles' => $articles, 'product' => 1]);
+        } else {
+            return view('frontend.game.index', ['games' => $games, 'articles' => $articles, 'product' => 1]);
+        }
+    }
+    
+    /**
      * Display game infos with all listing
      *
      * @param  string   $slug
@@ -105,27 +179,43 @@ class GameController
         // Get game id from slug string
         $game_id = ltrim(strrchr($slug,'-'),'-');
         $game = Game::with('listings')->find($game_id);
-
+        
         // Check if game exists
         if (is_null($game)) {
             return abort('404');
         }
-
-        // Check if slug is right
-        $slug_check = str_slug($game->name) . '-' . $game->platform->acronym . '-' . $game->id;
-
+        
+        $is_platform = 0;
+        $slug_check = "";
+        if ($game->platform) {
+            // Check if slug is right
+            $slug_check = str_slug($game->name) . '-' . $game->platform->acronym . '-' . $game->id;
+            $is_platform = 1;
+        } else if ($game->category) {
+            // Check if slug is right
+            $slug_check = str_slug($game->name) . '-' . $game->category->acronym . '-' . $game->id;
+        }
+        
         // Redirect to correct slug link
         if ($slug_check != $slug) {
             return Redirect::to(url('games/' . $slug_check));
         }
-
+        
         // Page title & description
-        SEO::setTitle(trans('general.title.game', ['game_name' => $game->name, 'platform' => $game->platform->name,'page_name' => config('settings.page_name')]));
+        if ($is_platform) {
+            SEO::setTitle(trans('general.title.game', ['game_name' => $game->name, 'platform' => $game->platform->name,'page_name' => config('settings.page_name')]));
+        } else {
+            SEO::setTitle(trans('general.title.game', ['game_name' => $game->name, 'platform' => $game->category->name,'page_name' => config('settings.page_name')]));
+        }
         SEO::setDescription( (strlen($game->description) > 147) ? substr($game->description, 0, 147) . '...' : $game->description );
-
+        
         // Get different platforms for the game
-        $different_platforms = Game::where('giantbomb_id','!=','0')->where('giantbomb_id', $game->giantbomb_id )->where('id', '!=', $game->id)->where('platform_id', '!=', $game->platform_id)->with('platform')->get();
-
+        if ($is_platform) {
+            $different_platforms = Game::where('giantbomb_id','!=','0')->where('giantbomb_id', $game->giantbomb_id )->where('id', '!=', $game->id)->where('platform_id', '!=', $game->platform_id)->with('platform')->get();
+        } else {
+            $different_platforms = array();
+        }
+        
         // Get image size for og
         if ($game->image_cover) {
           // Check if image is corrupted
@@ -224,15 +314,54 @@ class GameController
                 $removed_games = true;
             }
         }
-
+        
         if ($removed_games) {
             // Refresh game model
             $game = $game->fresh();
         }
-
+        
         return view('frontend.game.showTrade', ['tradegames' => $game->tradegames]);
     }
-
+    
+    public static function getEnumValues($column) {
+        $type = \DB::select(\DB::raw("SHOW COLUMNS FROM games WHERE Field = '{$column}'"))[0]->Type ;
+        preg_match('/^enum\((.*)\)$/', $type, $matches);
+        $enum = array();
+        foreach( explode(',', $matches[1]) as $value )
+        {
+            $v = trim( $value, "'" );
+            $enum = array_add($enum, $v, $v);
+        }
+        return $enum;
+    }
+    private function getCategoryInOneOrder($categories) {
+        if ($categories) {
+            $result = array();
+            foreach($categories as $category) {
+                $result[] = array(
+                    'id' => $category['id'],
+                    'name' => $category['name'],
+                    'icon' => $category['icon'],
+                    'description' => $category['description'],
+                    'color' => $category['color'],
+                    'acronym' => $category['acronym'],
+                    'cover_position' => $category['cover_position'],
+                    'game_api' => $category['game_api'],
+                    'slug' => $category['slug'],
+                    'depth' => $category['depth'],
+                );
+                $sub_categories = $this->getCategoryInOneOrder($category->childrensOn);
+                if ($sub_categories) {
+                    foreach($sub_categories as $sub_category) {
+                        array_push($result, $sub_category);
+                    }
+                }
+            }
+            
+            return $result;
+        }
+    }
+    
     /**
      * Form for adding a new game
      *
@@ -240,12 +369,12 @@ class GameController
      */
     public function add()
     {
-
+        
         // Check if user can add games to the system
         if (!Config::get('settings.user_add_item') && !(\Auth::user()->can('edit_games'))) {
             return abort(404);
         }
-
+        
         // Page title
         SEO::setTitle(trans('general.title.game_add', ['page_name' => config('settings.page_name')]));
         
@@ -253,10 +382,13 @@ class GameController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
-        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
-
-        return view('frontend.game.add', ['platforms' => Platform::all(), 'user' => $user]);
+        
+        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.game.category', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+        
+        $api_platforms = ['pc','ios','dreamcast','ps','ps2','ps3','ps4','psp','vita','xbox','xbox360','xboxone','gba','ds','3ds','gamecube','n64','wii','wii-u','switch'];
+        $platforms = Platform::whereIn('acronym', $api_platforms)->get();
+        
+        return view('frontend.game.add', ['categories' => $platforms, 'category_name' => 'Game', 'category_id' => 0, 'user' => $user]);
     }
 
     /**
@@ -273,7 +405,7 @@ class GameController
         // search for games
         $games = Game::hydrate(Searchy::games('name', 'tags')->query($value)->get()->toArray() );
 
-        $games->load('platform','giantbomb');
+        $games->load('platform','category','giantbomb');
 
         // Get the current page from the url if it's not set default to 1
         $page = Input::get('page', 1);
@@ -328,40 +460,105 @@ class GameController
     }
 
     /**
+     * Get Children Ids
+     *
+     * @param  Array Childrens
+     * @return String
+     */
+    private function getChildrenIds($childrens) {
+        $ids = '';
+        if ($childrens) {
+            if (count($childrens)) {
+                foreach ($childrens as $children) {
+                    if ($ids) $ids = $ids . ',';
+                    $ids = $ids . $children['id'];
+                    if ($this->getChildrenIds($children['childrens']))
+                        $ids = $ids . ',' . $this->getChildrenIds($children['childrens']);
+                }
+            }
+        }
+        return $ids;
+    }
+    
+    /**
+     * Get Children Ids + Own Id
+     *
+     * @param  Integer category_id
+     * @return Array
+     */
+    private function getCategoryChildrenIds($category_id) {
+        $result_ids = "";
+        $category = ProductCategory::find($category_id);
+        if ($category) {
+            $result_ids = $category_id;
+            $childrens = $category->childrens()->get();
+            $children_ids = $this->getChildrenIds($childrens);
+            
+            if ($children_ids) {
+                $result_ids = $result_ids . "," . $children_ids;
+            }
+        }
+        
+        return explode(",", $result_ids);
+    }
+
+    /**
      * Search with json response
      *
      * @param  String  $value
      * @return JSON
      */
-    public function searchJson($value)
+    public function searchJson($category, $value)
     {
         // Accept only ajax requests
         if(!Request::ajax()){
             return abort('404');
         }
-
-        $games = Game::hydrate(Searchy::games('name', 'tags')->query($value)
-      ->getQuery()->limit(10)->get()->toArray() );
-
-        $games->load('platform','giantbomb','listingsCount','cheapestListing');
-
+        
         $data = array();
-
-        foreach ($games as $game) {
-            $image_name = substr($game->cover, 0, -4);
-            $data[" " . $game->id]['id'] = $game->id;
-            $data[" " . $game->id]['name'] = $game->name;
-            $data[" " . $game->id]['pic'] = $game->image_square_tiny;
-            $data[" " . $game->id]['platform_name'] = $game->platform->name;
-            $data[" " . $game->id]['platform_color'] = $game->platform->color;
-            $data[" " . $game->id]['platform_acronym'] = $game->platform->acronym;
-            $data[" " . $game->id]['platform_digital'] = $game->platform->digitals->count() > 0 ? true : false;
-            $data[" " . $game->id]['listings'] = $game->listings_count;
-            $data[" " . $game->id]['release_year'] = $game->release_date ? $game->release_date->format('Y') : 'unknown';
-            $data[" " . $game->id]['cheapest_listing'] = $game->cheapest_listing;
-            $data[" " . $game->id]['url'] = $game->url_slug;
-            $data[" " . $game->id]['avgprice'] = $game->getAveragePrice();
-            $data[" " . $game->id]['avgprice_string'] = trans('listings.form.sell.avgprice', ['game_name' => $game->name, 'avgprice' => $game->getAveragePrice() ]);
+        
+        if (!$category) {
+            $games = Game::hydrate(Searchy::games('name', 'tags')->query($value)->getQuery()->limit(10)->get()->toArray() );
+            
+            $games->load('platform','giantbomb','listingsCount','cheapestListing');
+            
+            foreach ($games as $game) {
+                $image_name = substr($game->cover, 0, -4);
+                $data[" " . $game->id]['id'] = $game->id;
+                $data[" " . $game->id]['name'] = $game->name;
+                $data[" " . $game->id]['pic'] = $game->image_square_tiny;
+                $data[" " . $game->id]['platform_name'] = $game->platform->name;
+                $data[" " . $game->id]['platform_color'] = $game->platform->color;
+                $data[" " . $game->id]['platform_acronym'] = $game->platform->acronym;
+                $data[" " . $game->id]['platform_digital'] = $game->platform->digitals->count() > 0 ? true : false;
+                $data[" " . $game->id]['listings'] = $game->listings_count;
+                $data[" " . $game->id]['release_year'] = $game->release_date ? $game->release_date->format('Y') : 'unknown';
+                $data[" " . $game->id]['cheapest_listing'] = $game->cheapest_listing;
+                $data[" " . $game->id]['url'] = $game->url_slug;
+                $data[" " . $game->id]['avgprice'] = $game->getAveragePrice();
+                $data[" " . $game->id]['avgprice_string'] = trans('listings.form.sell.avgprice', ['game_name' => $game->name, 'avgprice' => $game->getAveragePrice() ]);
+            }
+        } else {
+            $category_ids = $this->getCategoryChildrenIds($category);
+            $games = Game::hydrate(Searchy::games('name', 'tags')->query($value)->getQuery()->whereIn('category_id', $category_ids)->limit(10)->get()->toArray() );
+            $games->load('category', 'listingsCount','cheapestListing');
+            
+            foreach ($games as $game) {
+                $image_name = substr($game->cover, 0, -4);
+                $data[" " . $game->id]['id'] = $game->id;
+                $data[" " . $game->id]['name'] = $game->name;
+                $data[" " . $game->id]['pic'] = $game->image_square_tiny;
+                $data[" " . $game->id]['platform_name'] = $game->category->name;
+                $data[" " . $game->id]['platform_color'] = $game->category->color;
+                $data[" " . $game->id]['platform_acronym'] = $game->category->acronym;
+                $data[" " . $game->id]['platform_digital'] = false;
+                $data[" " . $game->id]['listings'] = $game->listings_count;
+                $data[" " . $game->id]['release_year'] = $game->release_date ? $game->release_date->format('Y') : 'unknown';
+                $data[" " . $game->id]['cheapest_listing'] = $game->cheapest_listing;
+                $data[" " . $game->id]['url'] = $game->url_slug;
+                $data[" " . $game->id]['avgprice'] = $game->getAveragePrice();
+                $data[" " . $game->id]['avgprice_string'] = trans('listings.form.sell.avgprice', ['game_name' => $game->name, 'avgprice' => $game->getAveragePrice() ]);
+            }
         }
 
         // and return to typeahead
@@ -951,33 +1148,32 @@ class GameController
                 if ($giantbomb_game->tags) {
                     $game->tags = $giantbomb_game->tags;
                 }
-
+                
                 // Pegi add
                 if ($giantbomb_game->pegi){
                     $game->pegi = $giantbomb_game->pegi;
                 }
             }
-
+            
             // Get data from giantbomb and save to new game
             $game->giantbomb_id = $giantbomb_check->id;
             $game->description = $giantbomb_check->summary;
 
             $game->save();
-
+            
         // Add new Giantbomb data to database
         } else {
-
             // get giantbomb data
             try {
                 $giantbomb_game = $client->findOne('Game', $new_giantbomb_id);
-
+                
                 // Catch 404 error, when Giantbomb ID does not exists
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 // show a error message
                 \Alert::error('<i class="fa fa-times m-r-5"></i> Sorry, this Giantbomb ID does not exists!')->flash();
                 return Redirect::to(url($game->url_slug));
             }
-
+            
             $images = $giantbomb_game->get('images');
             $cover_image = $giantbomb_game->get('image');
             $videos = $giantbomb_game->get('videos');
@@ -988,13 +1184,13 @@ class GameController
             } catch (\InvalidArgumentException $ex) {
               $genres = null;
             }
-
+            
             $new_images = array();
             $new_videos = array();
-
+            
             if ($genres) {
                 $new_genres = array();
-
+                
                 // Genres add
                 foreach ($genres as $genre) {
                     array_push($new_genres, $genre['name']);
@@ -1011,104 +1207,100 @@ class GameController
                     }
                 }
             }
-
+            
             // Image add
             $image_help = 0;
-
+            
             foreach ($images as $image) {
                 $new_images[$image_help]['image'] = substr($image['icon_url'], 51 );
                 $new_images[$image_help]['tags'] = $image['tags'];
                 $image_help++;
             }
-
+            
             // Video Add
-
+            
             $video_help = 0;
-
+            
             foreach($videos as $video_api) {
                 if ($video_help == 20) {
                   break;
                 }
-
+                
                 if (substr($video_api['name'], 0, 16 ) != "Bombin' the A.M.") {
-
                     try {
-
+                        
                         $video = $client->findOne('Video', substr($video_api['api_detail_url'], 36, -1 ) );
-
+                        
                         $new_videos[$video_help]['name'] = $video_api['name'];
                         $new_videos[$video_help]['api_id'] = substr($video_api['api_detail_url'], 36, -1 );
-
+                        
                         $new_videos[$video_help]['id'] = $video->get('id');
                         $new_videos[$video_help]['length_seconds'] = $video->get('length_seconds');
                         $new_videos[$video_help]['deck'] = $video->get('deck');
                         $new_videos[$video_help]['video_type'] = $video->get('video_type');
-
+                        
                         if ($video->get('youtube_id') == '') {
                             $new_videos[$video_help]['youtube_id'] = 0;
                         } else {
                             $new_videos[$video_help]['youtube_id'] = $video->get('youtube_id');
                         }
-
+                        
                         $video_image = $video->get('image');
-
+                        
                         $help_image = substr($video_image['icon_url'], 50 );
-
+                        
                         $datatype = substr( $help_image, -3 );
                         $imgend = substr( $help_image, -6, 2 );
-
+                        
                         $url = 'https://www.giantbomb.com/api/image/scale_small/'. $help_image;
                         $imgHeaders = @get_headers( str_replace(' ', "%20", $url) )[0];
                         $imgfix = $help_image;
-
+                        
                         if ($imgHeaders == 'HTTP/1.1 403 Forbidden') {
                             $imgfix = $help_image;
                         } elseif ($imgHeaders == 'HTTP/1.1 404 Not Found') {
                             $imgfix = substr($help_image, 0, -4 ) . '.jpg';
                         }
-
+                        
                         $new_videos[$video_help]['image'] = $imgfix;
-
+                        
                         $video_help++;
-
-
                     } catch (\RuntimeException $e) {
                         // catch code
                     }
                 }
-
             }
-
+            
             // PEGI Rating and get all ratings
             $ratings = $giantbomb_game->get('original_game_rating');
-
+            
             $all_ratings = array();
-
+            
             if ($ratings != '') {
                 $pegi = 0;
-
+                
                 foreach ($ratings as $rating) {
                     // For array
                     array_push($all_ratings, $rating['name']);
-
+                    
                     // For database
                     $rating_name = substr($rating['name'], 0, 4);
-
+                    
                     if ($rating_name == "PEGI") {
                         $pegi = substr($rating['name'], 6, -1 );
                     }
                 }
-
+                
                 if ($pegi != 0) {
                     $game->pegi = $pegi;
                 }
             }
-
+            
             // Tags add
             if ($giantbomb_game->get('aliases') != '') {
               $game->tags = $giantbomb_game->get('aliases');
             }
-
+            
             // Data for SQL Insert
             $data = array(
                 'id' => $giantbomb_game->id,
@@ -1120,34 +1312,34 @@ class GameController
                 'videos' => json_encode($new_videos),
                 'ratings' => json_encode($all_ratings)
             );
-
+            
             // Inser Data in Table
             \DB::table('games_giantbomb')->insert($data);
-
+            
             // Image Beta
             $extension = 'jpg';
             $newfilename = time().'-'.$game->id.'.'.$extension;
             $disk = "local";
             $destination_path = "public/games";
-
+            
             $image_client = new Client();
             $image = $image_client->request('GET', $cover_image['super_url']);
-
+            
             // 2. Store the image on disk.
             \Storage::disk($disk)->put($destination_path.'/'.$newfilename, $image->getBody()->getContents());
-
+            
             // Delete old image
             if (!is_null($game->cover)) {
                 \Storage::disk($disk)->delete('/public/games/' . $game->cover );
             }
-
+            
             // Update Game Data with Giantbomb Info
             $game->giantbomb_id = $giantbomb_game->id;
             $game->cover = $newfilename;
             $game->description = $giantbomb_game->deck;
             $game->save();
         }
-
+        
         // show a success message
             \Alert::success('<i class="fa fa-save m-r-5"></i> ' . $game->name . ' Giantbomb ID successfully changed!')->flash();
         return Redirect::to(url($game->url_slug));
@@ -1161,19 +1353,41 @@ class GameController
      */
     public function order($order, $desc = null)
     {
-
         if ($order == 'release_date' || $order == 'metascore' || $order == 'listings' || $order == 'popularity') {
             session()->put('gamesOrder', $order);
         } else {
             session()->remove('gamesOrder');
         }
-
+        
         if ($desc == 'desc') {
             session()->put('gamesOrderByDesc', true);
         } else {
             session()->put('gamesOrderByDesc', false);
         }
-
+        
+        return Redirect::to(url()->current() == url()->previous() ? url('/') : url()->previous());
+    }
+    
+    /**
+     * Sort games
+     *
+     * @param  string  $slug
+     * @return mixed
+     */
+    public function orderProduct($order, $desc = null)
+    {
+        if ($order == 'release_date' || $order == 'listings' || $order == 'popularity') {
+            session()->put('productsOrder', $order);
+        } else {
+            session()->remove('productsOrder');
+        }
+        
+        if ($desc == 'desc') {
+            session()->put('productsOrderByDesc', true);
+        } else {
+            session()->put('productsOrderByDesc', false);
+        }
+        
         return Redirect::to(url()->current() == url()->previous() ? url('/') : url()->previous());
     }
 }

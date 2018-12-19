@@ -19,9 +19,9 @@ class Socialite {
 			'facebook',
 			'google',
 			'twitter',
-      'twitch',
-      'steam',
-      'battlenet',
+			'twitch',
+			'steam',
+			'battlenet',
 		];
 	}
 }

@@ -109,6 +109,7 @@ return [
 
     'listings' => 'Listings',
     'games' => 'Games',
+    'products' => 'Products',
     'offers' => 'Offers',
 
     'delete' => 'Delete',

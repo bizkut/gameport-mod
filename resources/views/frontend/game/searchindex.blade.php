@@ -44,6 +44,7 @@
             {{-- Generated game cover with platform on top --}}
             @if($game->cover_generator)
               <div class="lazy game-cover gen"  data-original="{{$game->image_cover}}"></div>
+              @if($game->platform)
               <div class="game-platform-gen" style="background-color: {{$game->platform->color}}; text-align: {{$game->platform->cover_position}};">
                 {{-- Check if platform logo setting is enabled --}}
                 @if( config('settings.platform_logo') )
@@ -52,6 +53,17 @@
                   <span>{{$game->platform->name}}</span>
                 @endif
               </div>
+              @elseif($game->category)
+              <div class="game-platform-gen" style="background-color: {{$game->category->color}}; text-align: {{$game->category->cover_position}};">
+                {{-- Check if platform logo setting is enabled --}}
+                @if( config('settings.platform_logo') )
+                  <img src="{{ asset('logos/' . $game->category->acronym . '_tiny.png/') }}" alt="{{$game->category->name}} Logo">
+                @else
+                  <span>{{$game->category->name}}</span>
+                @endif
+              </div>
+              @endif
+              @endif
             {{-- Normal game cover --}}
             @else
               <div class="lazy game-cover"  data-original="{{$game->image_cover}}"></div>

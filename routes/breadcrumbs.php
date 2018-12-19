@@ -30,8 +30,13 @@ Breadcrumbs::register('platform_listings', function($breadcrumbs, $system)
 // Home > [Listings] -> [Platform] -> [Listing]
 Breadcrumbs::register('listing', function($breadcrumbs, $listing)
 {
-    $breadcrumbs->parent('platform_listings', $listing->game->platform);
-    $breadcrumbs->push(trans('general.breadcrumbs.listing', ['username' => $listing->user->name, 'gamename' => $listing->game->name, 'platform' => $listing->game->platform->name ]), $listing->url_slug);
+    if ($listing->game->platform) {
+        $breadcrumbs->parent('platform_listings', $listing->game->platform);
+        $breadcrumbs->push(trans('general.breadcrumbs.listing', ['username' => $listing->user->name, 'gamename' => $listing->game->name, 'platform' => $listing->game->platform->name ]), $listing->url_slug);
+    } else if($listing->game->category) {
+        $breadcrumbs->parent('platform_listings', $listing->game->category);
+        $breadcrumbs->push(trans('general.breadcrumbs.listing', ['username' => $listing->user->name, 'gamename' => $listing->game->name, 'platform' => $listing->game->category->name ]), $listing->url_slug);
+    }
 });
 
 // Home > Games
@@ -41,11 +46,23 @@ Breadcrumbs::register('games', function($breadcrumbs)
     $breadcrumbs->push(trans('general.games'), route('games'));
 });
 
+// Home > Products
+Breadcrumbs::register('products', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push(trans('general.products'), route('games'));
+});
+
 // Home > Games -> [Game]
 Breadcrumbs::register('game', function($breadcrumbs, $game)
 {
+    if ($game->platform) {
     $breadcrumbs->parent('games');
-    $breadcrumbs->push($game->name . ' (' . $game->platform->name . ')', $game->url_slug);
+        $breadcrumbs->push($game->name . ' (' . $game->platform->name . ')', $game->url_slug);
+    } else if ($game->category) {
+    $breadcrumbs->parent('products');
+        $breadcrumbs->push($game->name . ' (' . $game->category->name . ')', $game->url_slug);
+    }
 });
 
 // Home > [Search]

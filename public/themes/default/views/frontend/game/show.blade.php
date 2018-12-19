@@ -55,7 +55,11 @@
           <i class="icon fab fa-facebook-f" aria-hidden="true"></i>
         </a>
         {{-- Twitter share --}}
+        @if($game->platform)
         <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_game', ['game_name' => $game->name, 'platform' => $game->platform->name, 'page_name' => config('settings.page_name')])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+        @elseif($game->category)
+        <a href="http://twitter.com/intent/tweet?text={{trans('general.share.twitter_game', ['game_name' => $game->name, 'platform' => $game->category->name, 'page_name' => config('settings.page_name')])}} &#8921; {{URL::current()}}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+        @endif
           <i class="icon fab fa-twitter" aria-hidden="true"></i>
         </a>
         {{-- Google plus share --}}
@@ -131,9 +135,11 @@
                 <div class="value-title">
                   {{ trans('listings.general.digital_download') }}
                 </div>
+                @if($listing->game->platform)
                 <div class="text">
                   {{$listing->game->platform->digitals->where('id',$listing->digital)->first()->name}}
                 </div>
+                @endif
               </div>
               @else
               {{-- Condition --}}
@@ -191,17 +197,23 @@
               {{-- Trade list --}}
               @if(!is_null($listing->trade_list))
               <div class="trade-list">
-                @php $trade_list = App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('platform')->get(); @endphp
+                @php $trade_list = App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('platform','category')->get(); @endphp
                 {{-- Get additional charges --}}
                 @php $add_charge = json_decode($listing->trade_list,true); @endphp
                 @foreach($trade_list as $trade_game)
                   {{-- Trade game with popover --}}
+                  @if($trade_game->platform)
                   <a href="javascript:void(0);" data-toggle="popover" data-html="true" data-placement="top" data-content='<span class="platform-label" style="background-color: {{ $trade_game->platform->color }};">{{ $trade_game->platform->name }}</span>@if($add_charge[$trade_game->id]['price_type'] != 'none') <span class="m-l-5 charge-label {{ $add_charge[$trade_game->id]['price_type'] == 'want' ? 'bg-danger' : 'bg-success'}}">{{ money($add_charge[$trade_game->id]['price'], Config::get('settings.currency')) }}</span> @endif' data-title='{{ $trade_game->name }}'>
                     <span class="avatar gray hvr-grow-shadow3 m-r-5">
                       <img src="{{$trade_game->image_square_tiny}}" style="box-shadow: 0px 0px 0px 2px {{ $trade_game->platform->color }};">
                     </span></a>
+                  @elseif($trade_game->category)
+                  <a href="javascript:void(0);" data-toggle="popover" data-html="true" data-placement="top" data-content='<span class="platform-label" style="background-color: {{ $trade_game->category->color }};">{{ $trade_game->category->name }}</span>@if($add_charge[$trade_game->id]['price_type'] != 'none') <span class="m-l-5 charge-label {{ $add_charge[$trade_game->id]['price_type'] == 'want' ? 'bg-danger' : 'bg-success'}}">{{ money($add_charge[$trade_game->id]['price'], Config::get('settings.currency')) }}</span> @endif' data-title='{{ $trade_game->name }}'>
+                    <span class="avatar gray hvr-grow-shadow3 m-r-5">
+                      <img src="{{$trade_game->image_square_tiny}}" style="box-shadow: 0px 0px 0px 2px {{ $trade_game->category->color }};">
+                    </span></a>
+                  @endif
                 @endforeach
-
               </div>
               @endif
 
@@ -250,7 +262,11 @@
             </div>
             {{-- Create listing button --}}
             @if(Auth::check())
+            @if($game->platform)
             <a href="{{ url('listings/' . str_slug($game->name) . '-' . $game->platform->acronym . '-' . $game->id . '/add' ) }}" class="btn btn-orange"><i class="fa fa-plus" aria-hidden="true"></i> {{ trans('listings.general.no_listings_add') }}</a>
+            @elseif($game->category)
+            <a href="{{ url('listings/' . str_slug($game->name) . '-' . $game->category->acronym . '-' . $game->id . '/add' ) }}" class="btn btn-orange"><i class="fa fa-plus" aria-hidden="true"></i> {{ trans('listings.general.no_listings_add') }}</a>
+            @endif
             @else
             <a href="javascript:void(0);" data-toggle="modal" data-target="#LoginModal" class="btn btn-orange"><i class="fa fa-plus" aria-hidden="true"></i> {{ trans('listings.general.no_listings_add') }}</a>
             @endif
@@ -264,7 +280,11 @@
         {{-- Site Action for adding new listing --}}
         <div class="site-action">
           @if(Auth::check())
+          @if($game->platform)
           <button type="button" onclick="location.href='{{ url('listings/' . str_slug($game->name) . '-' . $game->platform->acronym . '-' . $game->id . '/add' ) }}';" class="site-action-toggle btn-raised btn btn-orange btn-floating animation-scale-up">
+          @elseif($game->category)
+          <button type="button" onclick="location.href='{{ url('listings/' . str_slug($game->name) . '-' . $game->category->acronym . '-' . $game->id . '/add' ) }}';" class="site-action-toggle btn-raised btn btn-orange btn-floating animation-scale-up">
+          @endif
             <i class="front-icon fa fa-plus" aria-hidden="true"></i>
           </button>
           @else
@@ -280,14 +300,19 @@
 
       {{-- Admin quick toggles - no translation, it's just for the admin --}}
       @can('edit_games')
-
+      
       <div class="form-inline m-t-50">
         {{-- Edit game (redirect to admin panel) --}}
+        @if($game->platform)
         <a href="{{ url(config('backpack.base.route_prefix', 'admin') . '/game/' . $game->id . '/edit') }}" class="btn btn-dark m-r-5 m-t-10" target="_blank"><i class="fa fa-edit"></i> {{ trans('general.edit') }}</a>
+        @elseif($game->category)
+        <a href="{{ url(config('backpack.base.route_prefix', 'admin') . '/product/' . $game->id . '/edit') }}" class="btn btn-dark m-r-5 m-t-10" target="_blank"><i class="fa fa-edit"></i> {{ trans('general.edit') }}</a>
+        @endif
         @if(isset($game->metacritic))
         {{-- Refresh metacritic data --}}
         <a href="{{ url('games/' . $game->id . '/refresh/metacritic') }}" class="btn btn-dark m-r-5 m-t-10" id="refresh-metacritic"><i class="fa fa-sync"></i> Refresh Metacritic</a>
         @endif
+        @if($game->platform)
         {{-- Change giantbomb id --}}
         {!! Form::open(array('url' => 'games/change/giantbomb', 'class' => 'form-inline', 'style' => 'display: inline-block;')) !!}
         <div class="input-group m-t-10" style="width: 300px !important;">
@@ -299,6 +324,7 @@
           {!! Form::hidden('game_id', encrypt($game->id)) !!}
           <input type="text" name="giantbomb_id" class="form-control input" placeholder="Giantbomb ID" value="{{$game->giantbomb_id}}" style="height: auto;">
         </div>
+        @endif
         {!! Form::close() !!}
       </div>
 

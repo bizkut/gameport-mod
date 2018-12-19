@@ -29,12 +29,12 @@ class PageController extends Controller
         SEO::setTitle(trans('general.title.welcome', ['page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
 
         $listings = Cache::rememberForever('last_24_listings', function () {
-            return \App\Models\Listing::with('game', 'game.giantbomb', 'game.platform', 'user', 'user.location')->where('status', '=', null)->orderby('created_at', 'desc')->whereHas('user', function ($query) {$query->where('status',1);})->orWhere('status', '=', '0')->whereHas('user', function ($query) {$query->where('status',1);})->limit(24)->get();
+            return \App\Models\Listing::with('game', 'game.giantbomb', 'game.platform', 'game.category', 'user', 'user.location')->where('status', '=', null)->orderby('created_at', 'desc')->whereHas('user', function ($query) {$query->where('status',1);})->orWhere('status', '=', '0')->whereHas('user', function ($query) {$query->where('status',1);})->limit(24)->get();
         });
 
         // Games query
         $popular_games = Cache::rememberForever('popular_games', function () {
-            return \App\Models\Game::query()->with('platform','giantbomb','listingsCount','wishlistCount','metacritic')->withCount('heartbeat')->orderBy('heartbeat_count','desc')->limit('12')->get();
+            return \App\Models\Game::query()->with('platform','category','giantbomb','listingsCount','wishlistCount','metacritic')->withCount('heartbeat')->orderBy('heartbeat_count','desc')->limit('12')->get();
         });
 
         // Platforms query

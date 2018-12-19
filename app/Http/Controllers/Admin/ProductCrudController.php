@@ -3,10 +3,10 @@ namespace App\Http\Controllers\Admin;
 
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 // VALIDATION: change the requests to match your own file names if you need form validation
-use App\Http\Requests\GameRequest as StoreRequest;
-use App\Http\Requests\GameRequest as UpdateRequest;
+use App\Http\Requests\ProductRequest as StoreRequest;
+use App\Http\Requests\ProductRequest as UpdateRequest;
 
-class GameCrudController extends CrudController
+class ProductCrudController extends CrudController
 {
     public function setUp()
     {
@@ -17,8 +17,8 @@ class GameCrudController extends CrudController
         |--------------------------------------------------------------------------
         */
         $this->crud->setModel("App\Models\Game");
-        $this->crud->setRoute("admin/game");
-        $this->crud->setEntityNameStrings('game', 'games');
+        $this->crud->setRoute("admin/product");
+        $this->crud->setEntityNameStrings('product', 'products');
         $this->crud->enableAjaxTable();
 
         /*
@@ -31,28 +31,25 @@ class GameCrudController extends CrudController
 
         $this->crud->addField(['name'  => 'name' ,'attributes' => ['required' => 'required']]);
         $this->crud->addField(['name'  => 'description', 'type' => 'summernote']);
-        $this->crud->addField(['name'  => 'cover_generator', 'label' => 'Enable cover generator', 'type' => 'toggle', 'hint' => 'Add platform bar with logo on top of game cover.']);
-        $this->crud->addField(['name'  => 'cover', 'type'  => 'image_generator', 'upload' => true, 'crop' => true ]);
+        $this->crud->addField(['name'  => 'cover_generator', 'label' => 'Enable cover generator', 'type' => 'toggle', 'hint' => 'Add category bar with logo on top of product cover.']);
+        $this->crud->addField(['name'  => 'cover', 'type' => 'image_generator' , 'upload' => true, 'crop' => true ]);
         $this->crud->addField(['name'  => 'release_date','type' => 'date_picker', 'attributes' => ['required' => 'required']]);
         $this->crud->addField(['name'  => 'publisher']);
         $this->crud->addField(['name'  => 'developer']);
         $this->crud->addField(['name'  => 'pegi','type'  => 'enum']);
-        $this->crud->addField(['label' => "Platform", 'type' => 'select2', 'name' => 'platform_id', 'entity' => 'platform', 'attribute' => 'name', 'model' => "App\Models\Platform" ]);
+        $this->crud->addField(['label' => "Category", 'type' => 'select2', 'name' => 'category_id', 'entity' => 'category', 'attribute' => 'name', 'model' => "App\Models\ProductCategory", 'attributes' => ['required' => 'required']]);
         $this->crud->addField(['label' => "Genre", 'type' => 'select2', 'name' => 'genre_id', 'entity' => 'genre', 'attribute' => 'name', 'model' => "App\Models\Genre" ]);
-
+        
         $this->crud->addColumn(['name' => 'game_name', 'type' => 'model_function','function_name' => 'getNameAdmin',
         'searchLogic' => function ($query, $column, $searchTerm) {
               $query->orWhere('name', 'like', '%'.$searchTerm.'%');
           }
         ]);
-        $this->crud->addColumn(['name' => 'platform_id','type' => 'model_function','function_name' => 'getConsoleAdmin']);
+        $this->crud->addColumn(['name' => 'category_id', 'type' => 'model_function', 'function_name' => 'getCategoryAdmin']);
         $this->crud->addColumn(['name' => 'publisher']);
         $this->crud->addColumn(['name' => 'active_listings', 'label' => 'Active Listings', 'type' => 'model_function','function_name' => 'getListingsAdmin']);
-
-
-        $this->crud->addButtonFromView('top', 'add', 'create_game', 'beginning');
         
-        $this->crud->addClause('where', 'platform_id', '!=', Null);
+        $this->crud->addClause('where', 'category_id', '!=', Null);
         
         // ------ CRUD FIELDS
         // $this->crud->addField($options, 'update/create/both');

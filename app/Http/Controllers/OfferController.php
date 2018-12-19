@@ -59,7 +59,7 @@ class OfferController
             return abort('404');
         }
 
-        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform')->withTrashed()->find($offer->listing_id);
+        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform', 'game.category')->withTrashed()->find($offer->listing_id);
 
         // check if listing exist
         if (!$listing) {
@@ -81,8 +81,11 @@ class OfferController
             }
         }
 
-        SEO::setTitle(trans('general.title.offer', ['page_name' => config('settings.page_name'), 'platform' => $listing->game->platform->name, 'game_name' => $listing->game->name, 'user_name' => $offer->user->name]));
-
+        if ($listing->game->platform) {
+            SEO::setTitle(trans('general.title.offer', ['page_name' => config('settings.page_name'), 'platform' => $listing->game->platform->name, 'game_name' => $listing->game->name, 'user_name' => $offer->user->name]));
+        } else if ($listing->game->category) {
+            SEO::setTitle(trans('general.title.offer', ['page_name' => config('settings.page_name'), 'platform' => $listing->game->category->name, 'game_name' => $listing->game->name, 'user_name' => $offer->user->name]));
+        }
         $trade_game = Game::find($offer->trade_game);
 
         $thread = Thread::findOrFail($offer->thread_id);
@@ -259,22 +262,42 @@ class OfferController
 
         if ($offer->trade_game) {
             // Message
-            Message::create(
-                [
-                    'thread_id' => $thread->id,
-                    'user_id'   => \Auth::user()->id,
-                    'body'      => trans('offers.general.chat_trade', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->platform->name, 'trade_game' => $offer->game->name, 'Trade_platform' => $offer->game->platform->name]),
-                ]
-            );
+            if ($listing->game->platform) {
+                Message::create(
+                    [
+                        'thread_id' => $thread->id,
+                        'user_id'   => \Auth::user()->id,
+                        'body'      => trans('offers.general.chat_trade', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->platform->name, 'trade_game' => $offer->game->name, 'Trade_platform' => $offer->game->platform->name]),
+                    ]
+                );
+            } else if ($listing->game->category) {
+                Message::create(
+                    [
+                        'thread_id' => $thread->id,
+                        'user_id'   => \Auth::user()->id,
+                        'body'      => trans('offers.general.chat_trade', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->category->name, 'trade_game' => $offer->game->name, 'Trade_platform' => $offer->game->platform->name]),
+                    ]
+                );
+            }
         } else {
             // Message
-            Message::create(
-                [
-                    'thread_id' => $thread->id,
-                    'user_id'   => \Auth::user()->id,
-                    'body'      => trans('offers.general.chat_buy', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->platform->name, 'price' => $offer->price_offer_formatted]),
-                ]
-            );
+            if ($listing->game->platform) {
+                Message::create(
+                    [
+                        'thread_id' => $thread->id,
+                        'user_id'   => \Auth::user()->id,
+                        'body'      => trans('offers.general.chat_buy', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->platform->name, 'price' => $offer->price_offer_formatted]),
+                    ]
+                );
+            } else if ($listing->game->category) {
+                Message::create(
+                    [
+                        'thread_id' => $thread->id,
+                        'user_id'   => \Auth::user()->id,
+                        'body'      => trans('offers.general.chat_buy', ['game_name' => $listing->game->name, 'platform_name' => $listing->game->category->name, 'price' => $offer->price_offer_formatted]),
+                    ]
+                );
+            }
         }
 
         // Sender
@@ -1094,7 +1117,7 @@ class OfferController
             return abort('404');
         }
 
-        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform')->withTrashed()->find($offer->listing_id);
+        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform', 'game.category')->withTrashed()->find($offer->listing_id);
 
         // check if listing exist
         if (!$listing) {
@@ -1299,7 +1322,7 @@ class OfferController
             return abort('404');
         }
 
-        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform')->withTrashed()->find($offer->listing_id);
+        $listing = Listing::with('game', 'user', 'game.giantbomb', 'game.platform', 'game.category')->withTrashed()->find($offer->listing_id);
 
         // check if listing exist
         if (!$listing) {

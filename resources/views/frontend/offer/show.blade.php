@@ -48,6 +48,7 @@
             {{-- Generated game cover with platform on top --}}
             @if($game->cover_generator)
               <div class="lazy game-cover gen"  data-original="{{$game->image_cover}}"></div>
+              @if($game->platform)
               <div class="game-platform-gen" style="background-color: {{$game->platform->color}}; text-align: {{$game->platform->cover_position}};">
                 {{-- Check if platform logo setting is enabled --}}
                 @if( config('settings.platform_logo') )
@@ -56,6 +57,16 @@
                   <span>{{$game->platform->name}}</span>
                 @endif
               </div>
+              @elseif($game->category)
+              <div class="game-platform-gen" style="background-color: {{$game->category->color}}; text-align: {{$game->category->cover_position}};">
+                {{-- Check if category logo setting is enabled --}}
+                @if( config('settings.platform_logo') )
+                  <img src="{{ asset('logos/' . $game->category->acronym . '_tiny.png/') }}" alt="{{$game->category->name}} Logo">
+                @else
+                  <span>{{$game->category->name}}</span>
+                @endif
+              </div>
+              @endif
             {{-- Normal game cover --}}
             @else
               <div class="lazy game-cover"  data-original="{{$game->image_cover}}"></div>
@@ -118,6 +129,7 @@
               {{-- Generated game cover with platform on top --}}
               @if($trade_game->cover_generator)
                 <div class="lazy game-cover gen"  data-original="{{$trade_game->image_cover}}"></div>
+                @if($game->platform)
                 <div class="game-platform-gen" style="background-color: {{$trade_game->platform->color}}; text-align: {{$trade_game->platform->cover_position}};">
                   {{-- Check if platform logo setting is enabled --}}
                   @if( config('settings.platform_logo') )
@@ -126,6 +138,16 @@
                     <span>{{$trade_game->platform->name}}</span>
                   @endif
                 </div>
+                @elseif($game->category)
+                <div class="game-platform-gen" style="background-color: {{$trade_game->category->color}}; text-align: {{$trade_game->category->cover_position}};">
+                  {{-- Check if category logo setting is enabled --}}
+                  @if( config('settings.platform_logo') )
+                    <img src="{{ asset('logos/' . $trade_game->category->acronym . '_tiny.png/') }}" alt="{{$trade_game->category->name}} Logo">
+                  @else
+                    <span>{{$trade_game->category->name}}</span>
+                  @endif
+                </div>
+                @endif
               {{-- Normal game cover --}}
               @else
                 <div class="lazy game-cover"  data-original="{{$trade_game->image_cover}}"></div>
@@ -529,6 +551,9 @@
               <span class="profile-name small">
                 {{$listing->user->name}}
               </span>
+              <span class="profile-description small">
+                {!! str_limit(strip_tags($listing->user->description), $limit = 20, $end = '...') !!}
+              </span>
               <span class="profile-location small">
               @if($listing->user->location)
                 <img src="{{ asset('img/flags/' .   $listing->user->location->country_abbreviation . '.svg') }}" height="14"/> {{$listing->user->location->country_abbreviation}}, {{$listing->user->location->place}} <span class="postal-code">{{$listing->user->location->postal_code}}</span>
@@ -617,6 +642,9 @@
             <div>
               <span class="profile-name small">
                 {{$offer->user->name}}
+              </span>
+              <span class="profile-description small">
+                {!! str_limit(strip_tags($offer->user->description), $limit = 20, $end = '...') !!}
               </span>
               <span class="profile-location small">
               @if($offer->user->location)
@@ -714,6 +742,9 @@
           <div>
             <span class="profile-name small">
               {{$user->name}}
+            </span>
+            <span class="profile-description small">
+              {!! str_limit(strip_tags($user->description), $limit = 20, $end = '...') !!}
             </span>
             <span class="profile-location small">
             @if($user->location)

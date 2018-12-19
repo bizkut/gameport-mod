@@ -43,7 +43,11 @@
                 {{-- Game title and platform --}}
                 <div>
                   <span class="selected-game-title">
+                    @if($game->platform)
                     <strong class="f-w-700">{{$game->name}}</strong><span class="platform-label m-l-5" style="background-color:{{$game->platform->color}}; ">{{$game->platform->name}}</span>
+                    @elseif($game->category)
+                    <strong class="f-w-700">{{$game->name}}</strong><span class="platform-label m-l-5" style="background-color:{{$game->category->color}}; ">{{$game->category->name}}</span>
+                    @endif
                   </span>
                   <span>{{ trans('listings.general.condition') .': '. $listing->condition_string . ' - ' .  trans('payment.sold_by', ['username' => $listing->user->name, 'country' => $listing->user->location->country_abbreviation,'place' => $listing->user->location->place]) }}</span>
                 </div>

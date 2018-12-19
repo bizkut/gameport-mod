@@ -192,9 +192,9 @@ class Game extends Model
         if (! array_key_exists('listingsCount', $this->relations)) {
             $this->load('listingsCount');
         }
-
+        
         $related = $this->getRelation('listingsCount');
-
+        
         // then return the count directly
         return ($related) ? (int) $related->aggregate : 0;
     }
@@ -210,9 +210,9 @@ class Game extends Model
         if (! array_key_exists('wishlistCount', $this->relations)) {
             $this->load('wishlistCount');
         }
-
+        
         $related = $this->getRelation('wishlistCount');
-
+        
         // then return the count directly
         return ($related) ? (int) $related->aggregate : 0;
     }
@@ -228,14 +228,14 @@ class Game extends Model
         if (! array_key_exists('cheapestListing', $this->relations)) {
             $this->load('cheapestListing');
         }
-
+        
         $related = $this->getRelation('cheapestListing');
-
+        
         // format cheapest price
         if ($related) {
             $cheapest_price = money($related->aggregate, Config::get('settings.currency'))->format();
         };
-
+        
         // then return the price directly
         return ($related) ?  $cheapest_price : 0;
     }
@@ -251,9 +251,9 @@ class Game extends Model
         if (! array_key_exists('averagePrice', $this->relations)) {
             $this->load('averagePrice');
         }
-
+        
         $related = $this->getRelation('averagePrice');
-
+        
         // then return the count directly
         return ($related) ? money($related->aggregate / 1, Config::get('settings.currency'))->format($currency, Config::get('settings.decimal_place')) : 0;
     }
@@ -358,7 +358,7 @@ class Game extends Model
     public function getUrlSlugAttribute()
     {
         if ($this->category_id) {
-            return url('games/' . str_slug($this->name) . '-' . $this->category->acronym . '-' . $this->id);
+            return url('products/' . str_slug($this->name) . '-' . $this->category->acronym . '-' . $this->id);
         }
         if ($this->platform_id) {
             return url('games/' . str_slug($this->name) . '-' . $this->platform->acronym . '-' . $this->id);
@@ -398,6 +398,16 @@ class Game extends Model
         return '<span class="label" style="background-color: '. $this->fresh()->platform->color . ';">' . $this->fresh()->platform->name .'</span>';
     }
 
+    /*
+    |
+    | Get Category label for backend
+    |
+    */
+    public function getCategoryAdmin()
+    {
+        return '<span class="label" style="background-color: '. $this->fresh()->category->color . ';">' . $this->fresh()->category->name .'</span>';
+    }
+    
     /*
     |
     | Get Name with cover and release year for backend

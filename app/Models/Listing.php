@@ -186,7 +186,11 @@ class Listing extends Model
     */
     public function getUrlSlugAttribute()
     {
-        return url('listings/' . str_slug($this->game->name) . '-' . $this->game->platform->acronym . '-' . strtolower($this->user->name) . '-' . $this->id);
+        if ($this->game->platform) {
+            return url('listings/' . str_slug($this->game->name) . '-' . $this->game->platform->acronym . '-' . strtolower($this->user->name) . '-' . $this->id);
+        } else if ($this->game->category) {
+            return url('listings/' . str_slug($this->game->name) . '-' . $this->game->category->acronym . '-' . strtolower($this->user->name) . '-' . $this->id);
+        }
     }
 
     /*
@@ -303,11 +307,20 @@ class Listing extends Model
     */
     public function getGameAdmin()
     {
-        return '<div class="user-block">
+        if ($this->fresh()->game->platform) {
+            return '<div class="user-block">
 					<img class="img-circle" src="' . $this->fresh()->game->image_square_tiny . '" alt="User Image">
 					<span class="username"><a href="' . $this->fresh()->url_slug .'" target="_blank">' . $this->fresh()->game->name . '</a></span>
 					<span class="description"><span class="label" style="background-color: '. $this->fresh()->game->platform->color . '; margin-right: 10px;">' . $this->fresh()->game->platform->name .'</span><i class="fa fa-calendar"></i> ' . $this->fresh()->game->release_date->format('Y') . '</span>
 				</div>';
+        } else if ($this->fresh()->game->category) {
+            return '<div class="user-block">
+					<img class="img-circle" src="' . $this->fresh()->game->image_square_tiny . '" alt="User Image">
+					<span class="username"><a href="' . $this->fresh()->url_slug .'" target="_blank">' . $this->fresh()->game->name . '</a></span>
+					<span class="description"><span class="label" style="background-color: '. $this->fresh()->game->category->color . '; margin-right: 10px;">' . $this->fresh()->game->category->name .'</span><i class="fa fa-calendar"></i> ' . $this->fresh()->game->release_date->format('Y') . '</span>
+				</div>';
+            
+        }
     }
 
     /*

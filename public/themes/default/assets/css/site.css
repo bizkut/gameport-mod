@@ -222,6 +222,11 @@
   color: inherit;
 }
 
+.page-aside .list-group-item .profile-description {
+  font-size: 14px;
+  line-height: 14px;
+  color: inherit;
+}
 .page-aside .list-group-item .last-message {
   font-size: 12px;
   color: #757575;
@@ -4825,6 +4830,14 @@ text-decoration: none;
   line-height: 30px;
 }
 
+.profile-description {
+  font-weight: 500;
+  color: #eee;
+  font-size: 20px;
+  display: block;
+  line-height: 20px;
+}
+
 .profile-avatar {
   width: 80px !important;
 }
@@ -4837,6 +4850,14 @@ text-decoration: none;
 .profile-name.small{
   font-size: 18px;
   line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.profile-description.small{
+  font-size: 16px;
+  line-height: 16px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

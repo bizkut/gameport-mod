@@ -29,12 +29,12 @@ class WishlistController extends Controller
       }
 
       // Get all wishlist entries from this user
-      $wishlists = Wishlist::where('user_id', Auth::id())->with('game','listings','listings.game','listings.game.platform','listings.user')->orderBy('created_at','desc')->paginate('10');
+      $wishlists = Wishlist::where('user_id', Auth::id())->with('game','listings','listings.game','listings.game.platform','listings.game.category','listings.user')->orderBy('created_at','desc')->paginate('10');
 
       // SEO Page Title
       SEO::setTitle(trans('wishlist.wishlist'). ' - ' . config('settings.page_name') . ' » ' . config('settings.sub_title'));
 
-      $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+      $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.game.category','listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
 
       return view('frontend.wishlist.index', ['wishlists' => $wishlists, 'user' => $user]);
     }

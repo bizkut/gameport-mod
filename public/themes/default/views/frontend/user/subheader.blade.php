@@ -25,9 +25,12 @@
         <img src="{{$user->avatar_square}}" alt="{{$user->name}}'s Avatar"><i></i>
       </span>
       <div>
-        {{-- User Name & Location --}}
+        {{-- User Name & Description & Location --}}
         <span class="profile-name">
           {{$user->name}}
+        </span>
+        <span class="profile-description">
+          {!! str_limit(strip_tags($user->description), $limit = 70, $end = '...') !!}
         </span>
         <span class="profile-location">
         @if($user->location)
@@ -52,6 +55,20 @@
         @endif
       </div>
     </div>
+    <div class="subheader-social-comments">
+        {{-- Facebook share --}}
+        @if($user->facebook_link)
+        <a href="{{ $user->facebook_link }}" onclick="window.open(this.href, 'facebookwindow','left=20,top=20,width=600,height=400,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-facebook m-r-5">
+          <i class="icon fab fa-facebook-f" aria-hidden="true"></i>
+        </a>
+        @endif
+        {{-- Twitter share --}}
+        @if($user->twitter_link)
+        <a href="{{ $user->facebook_link }}" onclick="window.open(this.href, 'twitterwindow','left=20,top=20,width=600,height=300,toolbar=0,resizable=1'); return false;" class="btn btn-icon btn-round btn-lg social-twitter m-r-5">
+          <i class="icon fab fa-twitter" aria-hidden="true"></i>
+        </a>
+        @endif
+      </div>
     <div class="rating-wrapper no-flex-shrink">
     {{-- User Ratings --}}
     @if(is_null($user->positive_percent_ratings))
@@ -93,5 +110,6 @@
     @endif
     </div>
   </div>
+  
 
 @stop

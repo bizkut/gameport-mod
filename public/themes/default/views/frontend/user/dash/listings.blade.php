@@ -135,7 +135,11 @@
           {{-- Game Name + platform --}}
           <div>
             <div class="title">{{ $listing->game->name }}</div>
+            @if($listing->game->platform)
             <span class="platform-label" style="background-color:{{ $listing->game->platform->color }};"> {{ $listing->game->platform->name }} </span>
+            @elseif($listing->game->category)
+            <span class="platform-label" style="background-color:{{ $listing->game->category->color }};"> {{ $listing->game->category->name }} </span>
+            @endif
           </div>
         </div>
         <div class="flex-center no-flex-shrink">
@@ -227,7 +231,11 @@
                 <div>
                   {{-- Game title & platform / icon when suggestion --}}
                   <div class="offer-game-title">@if(!$offer->trade_from_list)<span class="m-r-5"><i class="fa fa-retweet" aria-hidden="true"></i></span>@endif{{ $offer->game->name }}</div>
+                  @if($offer->game->platform)
                   <span class="platform-label" style="background-color:{{ $offer->game->platform->color }};">{{ $offer->game->platform->name }} </span>
+                  @elseif($offer->game->category)
+                  <span class="platform-label" style="background-color:{{ $offer->game->category->color }};">{{ $offer->game->category->name }} </span>
+                  @endif
                 </div>
               </div>
               @endif

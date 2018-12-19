@@ -120,11 +120,11 @@ class ListingCrudController extends CrudController
 
     public function showDetailsRow($id)
     {
-        $listing = \App\Models\Listing::with('game', 'user', 'game.giantbomb', 'game.platform')->find($id);
+        $listing = \App\Models\Listing::with('game', 'user', 'game.giantbomb', 'game.platform', 'game.category')->find($id);
 
         // Trade list
         if ($listing->trade_list) {
-            $trade_list = \App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('giantbomb', 'platform')->get();
+            $trade_list = \App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('giantbomb', 'platform', 'categpry')->get();
         } else {
             $trade_list = null;
         }

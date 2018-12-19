@@ -97,7 +97,6 @@
 
 {{-- Show selected game when game is set --}}
 @if(isset($game))
-
   {{-- Start selected game panel --}}
   <section class="panel" id="game">
     <div class="panel-body">
@@ -111,9 +110,15 @@
           <span class="selected-game-title">
             <strong>{{$game->name}}</strong>@if($game->release_date)<span class="release-year m-l-5">{{$game->release_date->format('Y')}}</span>@endif
           </span>
+          @if($game->platform)
           <span class="platform-label" style="background-color:{{$game->platform->color}}; ">
             {{$game->platform->name}}
           </span>
+          @elseif($game->category)
+          <span class="platform-label" style="background-color:{{$game->category->color}}; ">
+            {{$game->category->name}}
+          </span>
+          @endif
         </div>
       </div>
     </div>
@@ -126,24 +131,42 @@
   <section class="panel" id="select-game">
 
     <div class="panel-heading">
-      <h3 class="panel-title">{{ trans('listings.form.game.select') }}</h3>
+      <h3 class="panel-title select-game-title">{{ trans('listings.form.game.select') }}</h3>
     </div>
 
     <div class="panel-body">
+      {{-- Input group for game type --}}
+      <div class="input-wrapper">
+        <div class="input-group input-group-lg select-product">
+          <div class="input-group-btn search-panel">
+            <button type="button" id="platform_select" class="btn dropdown-toggle dropdown-system dropup" data-toggle="dropdown">
+              <span id="select_type">{{ trans('listings.form.game.name') }}</span> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu systems" role="menu">
+              <li><a href="#">{{ trans('listings.form.game.name') }}</a></li>
+              @can('edit_products')
+              <li><a href="#">{{ trans('listings.form.product.name') }}</a></li>
+              @endcan
+            </ul>
+          </div>
+        </div>
+      </div>
       {{-- Input group for game search --}}
-      <div class="input-group input-group-lg select-game">
-        <span class="input-group-addon">
-          {{-- Search icon when search is complete --}}
-          <span id="listingsearchcomplete">
-            <i class="fa fa-search"></i>
+      <div class="input-wrapper">
+        <div class="input-group input-group-lg select-game">
+          <span class="input-group-addon">
+            {{-- Search icon when search is complete --}}
+            <span id="listingsearchcomplete">
+              <i class="fa fa-search"></i>
+            </span>
+            {{-- Spin icon when search is in progress --}}
+            <span class="hidden" id="listingsearching">
+              <i class="fa fa-sync fa-spin"></i>
+            </span>
           </span>
-          {{-- Spin icon when search is in progress --}}
-          <span class="hidden" id="listingsearching">
-            <i class="fa fa-sync fa-spin"></i>
-          </span>
-        </span>
-        {{-- Input for typeahead --}}
-        <input type="text" class="form-control rounded input-lg inline input" id="offersearch" autocomplete="off" placeholder="{{ trans('listings.form.placeholder.game_name') }}">
+          {{-- Input for typeahead --}}
+          <input type="text" class="form-control rounded input-lg inline input" id="offersearch" autocomplete="off" placeholder="{{ trans('listings.form.placeholder.game_name') }}">
+        </div>
       </div>
     </div>
 
@@ -152,7 +175,7 @@
     <div class="panel-footer game-add">
       {{-- Link to game add --}}
       <div>
-        <span class="text m-r-10">{{ trans('listings.form.game.not_found') }}</span> <a href="{{ url('games/add')  }}" class="add-link"><i class="fa fa-plus"></i> {{ trans('listings.form.game.add') }}</a>
+        <span class="text m-r-10 not-found">{{ trans('listings.form.game.not_found') }}</span> <a href="{{ url('games/add')  }}" class="add-link"><i class="fa fa-plus"></i> <span class="add-name"> {{ trans('listings.form.game.add') }}</span></a>
       </div>
     </div>
     @endif
@@ -175,7 +198,7 @@
   @if(isset($game))
   <input name="game_id" type="hidden" value="{{$game->id}}" />
   @else
-  <div class="selected-game"></div>
+  <div class="selected-game" id="selected-game-entry"></div>
   @endif
 @endif
 
@@ -195,9 +218,22 @@
       <div class="row no-space">
         <div class="form-group row">
           {{-- Digital Download --}}
-          <div class="col-sm-6 {{ isset($game) ? $game->platform->digitals->count() > 0 ? '' : 'hidden' : '' }}" id="digital-input">
+          @if(isset($game))
+          @if($game->platform)
+          <div class="col-sm-6 {{ $game->platform->digitals->count() > 0 ? '' : 'hidden' }}" id="digital-input">
+          @endif
+          @else
+          <div class="col-sm-6 " id="digital-input">
+          @endif
             <div class="checkbox-custom checkbox-default checkbox-lg">
-              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ isset($game) ? $game->platform->acronym : '' }}" {{ (isset($listing) && $listing->digital) ? 'checked' : '' }} @if(config('settings.digital_downloads_only')) checked disabled @endif />
+              @if(isset($game))
+              @if($game->platform)
+              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->platform->acronym }}"/>
+              @elseif($game->category)
+              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->category->acronym }}"/>
+              @endif
+              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="" {{ (isset($listing) && $listing->digital) ? 'checked' : '' }} @if(config('settings.digital_downloads_only')) checked disabled @endif/>
+              @endif
               <label for="digital">
                 {{ trans('listings.form.details.digital') }}
               </label>
@@ -207,10 +243,12 @@
               <select class="form-control select" id="digital_distributor" name="digital_distributor" {{ (isset($listing) && $listing->digital) ? '' : 'disabled' }}>
                 {{-- Show digital distributors on edit --}}
                 @if(isset($listing) && $listing->digital)
+                  @if($game->platform)
                   @foreach($game->platform->digitals as $digital)
                   <option value="{{$digital->id}}" {{ $digital->id == $listing->digital ? 'selected' : ''}}>{{$digital->name}}
                   </option>
                   @endforeach
+                  @endif
                 @endif
               </select>
             </div>
@@ -535,7 +573,11 @@
               {{-- Game title & platform --}}
               <div>
                 <span class="title">{{$tgame->name}}</span>
+                @if($tgame->platform)
                 <span class="platform-label" style="background-color:{{$tgame->platform->color}}; ">{{$tgame->platform->name}}</span>
+                @elseif($tgame->category)
+                <span class="platform-label" style="background-color:{{$tgame->category->color}}; ">{{$tgame->category->name}}</span>
+                @endif
               </div>
             </div>
 
@@ -632,7 +674,6 @@
               </button>
               <ul class="dropdown-menu systems" role="menu">
                 @foreach($platforms as $platform)
-
                 <li><a href="#{{ $platform->acronym }}" data-color="{{$platform->color}}">{{ $platform->name }}</a></li>
                   @if($loop->iteration == 7)
                     <li class="divider" role="presentation"></li>
@@ -748,6 +789,42 @@
 
     <div class="panel-footer game-add">
       <div><a href="javascript:void(0)" class="reselect-game add-link m-r-10"><i class="fa fa-repeat" aria-hidden="true"></i> {{ trans('listings.form.game.reselect') }}</a><span class="text">{{ trans('listings.form.game.reselect_info') }}</span></div>
+    </div>
+
+    <input name="game_id" type="hidden" value="<% id %>">
+
+  </section>
+
+</script>
+{{-- End Mustache Template for selected game --}}
+
+{{-- Start Mustache Template for selected product --}}
+<script id="selected-product" type="x-tmpl-mustache">
+
+  <section class="panel" id="game-<% id %>">
+
+    <div class="panel-heading">
+      <h3 class="panel-title">{{ trans('listings.form.product.selected') }}</h3>
+    </div>
+
+    <div class="panel-body" >
+      <div class="flex-center">
+        <div>
+          <span class="avatar m-r-10"><img src="<% pic %>" /></span>
+        </div>
+        <div>
+            <span class="selected-game-title">
+              <% name %><span class="release-year m-l-5"><% release_year %></span>
+            </span>
+            <span class="platform-label" style="background-color:<% platform_color %>;">
+              <% platform_name %>
+            </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-footer game-add">
+      <div><a href="javascript:void(0)" class="reselect-game add-link m-r-10"><i class="fa fa-repeat" aria-hidden="true"></i> {{ trans('listings.form.product.reselect') }}</a><span class="text">{{ trans('listings.form.game.reselect_info') }}</span></div>
     </div>
 
     <input name="game_id" type="hidden" value="<% id %>">
@@ -1168,31 +1245,50 @@ $(document).ready(function(){
   $('#loading_bar').hide();
   $('.send-search').hide();
 
-  // get platform
+  // get platform && type
   var platform = "no";
+  var add_type = "{{ trans('listings.form.game.name') }}";
   $('.search-panel .dropdown-menu').find('a').click(function(e) {
-  e.preventDefault();
-      platform = $(this).attr("href").replace("#","");
-      color = $(this).data("color");
-  var concept = $(this).text();
-  $('.search-panel span#search_concept').text(concept);
-  $('.input-group #search_param').val(platform);
-      $('#platform_select').css("background-color", color );
+    e.preventDefault();
+    platform = $(this).attr("href").replace("#","");
+    color = $(this).data("color");
+    var concept = $(this).text();
+    $('.search-panel span#search_concept').text(concept);
+    $('.input-group #search_param').val(platform);
+    $('#platform_select').css("background-color", color );
+    if (concept == "{{ trans('listings.form.product.name') }}") {
+        $('.select-game-title').text("{{ trans('listings.form.product.select') }}");
+        $('#offersearch').attr("placeholder", "{{ trans('listings.form.placeholder.product_name') }}");
+        $('.add-name').text(" {{ trans('listings.form.product.add') }}");
+        $('.not-found').text(" {{ trans('listings.form.product.not_found') }}");
+        $('.add-link').attr("href", "{{ url('admin/product/create') }}");
+        $('#select_type').text(" {{ trans('listings.form.product.name') }}");
+        $('#selected-game-entry').removeClass('selected-game');
+        $('#selected-game-entry').addClass('selected-product');
+        add_type = "{{ trans('listings.form.product.name') }}";
+    } else {
+        $('.select-game-title').text("{{ trans('listings.form.game.select') }}");
+        $('#offersearch').attr("placeholder", "{{ trans('listings.form.placeholder.game_name') }}");
+        $('.add-name').text(" {{ trans('listings.form.game.add') }}");
+        $('.not-found').text(" {{ trans('listings.form.game.not_found') }}");
+        $('.add-link').attr("href", "{{ url('games/add') }}");
+        $('#select_type').text(" {{ trans('listings.form.game.name') }}");
+        $('#selected-game-entry').removeClass('selected-product');
+        $('#selected-game-entry').addClass('selected-game');
+        add_type = "{{ trans('listings.form.game.name') }}";
+    }
 
-
-      // Check if platform is selected
-      if($(this).attr("href") == "no") {
-          $('.send-search').fadeOut(200).promise().done(function(){
-              $('.error-search').fadeIn(200);
-          });
-      }else{
-          $('.error-search').fadeOut(200).promise().done(function(){
-              $('.send-search').fadeIn(200);
-          });
-
-      }
-
-    });
+    // Check if platform is selected
+    if($(this).attr("href") == "no") {
+      $('.send-search').fadeOut(200).promise().done(function(){
+        $('.error-search').fadeIn(200);
+      });
+    }else{
+      $('.error-search').fadeOut(200).promise().done(function(){
+        $('.send-search').fadeIn(200);
+      });
+    }
+  });
 
     {{-- Check if search input have value --}}
     $("#appendedInput").keyup(function(event){
@@ -1270,10 +1366,20 @@ $(document).ready(function(){
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
       url: '{{ url("games/search/json/%QUERY") }}',
+      replace: function(url, query) {
+        if(add_type == "{{ trans('listings.form.product.name') }}") {
+          return "{{ url("games/search/product/json/") }}" + "/" + query;
+        } else {
+            return "{{ url("games/search/json/") }}" + "/" + query;
+        }
+      },
       wildcard: '%QUERY'
     }
   });
 
+  var game_add_url = "{{ url("games/add") }}";
+  var no_game_found = "";
+  var no_game_found_add = "";
   {{-- Typeahead with data from bloodhound engine --}}
   $('#offersearch').typeahead(null, {
     name: 'offer-search',
@@ -1282,20 +1388,27 @@ $(document).ready(function(){
     highlight: true,
     limit:6,
     templates: {
-      {{-- Check if user can add games to the system --}}
-      @if(Config::get('settings.user_add_item'))
-      empty: [
-        '<div class="nosearchresult bg-danger"><a href="{{ url("games/add") }}">',
-          '<span><i class="fa fa-ban"></i> {{ trans('listings.form.validation.no_game_found') }} <strong>{{ trans('listings.form.validation.no_game_found_add') }}</strong><span>',
-        '</a></div>'
-      ].join('\n'),
-      @else
-      empty: [
-        '<div class="nosearchresult bg-danger">',
-          '<span><i class="fa fa-ban"></i> {{ trans('listings.form.validation.no_game_found') }}<span>',
-        '</div>'
-      ].join('\n'),
-      @endif
+      empty: function() {
+        if(add_type == "{{ trans('listings.form.product.name') }}") {
+            game_add_url = "{{ url("admin/product/create") }}";
+            no_game_found = "{{ trans('listings.form.validation.no_product_found')}}";
+            no_game_found_add = "{{ trans('listings.form.validation.no_product_found_add')}}";
+        } else {
+            game_add_url = "{{ url("games/add") }}";
+            no_game_found = "{{ trans('listings.form.validation.no_game_found')}}";
+            no_game_found_add = "{{ trans('listings.form.validation.no_game_found_add')}}";
+        }
+        {{-- Check if user can add games to the system --}}
+        @if(Config::get('settings.user_add_item'))
+          return '<div class="nosearchresult bg-danger"><a href="' + game_add_url + '">' +
+                '<span><i class="fa fa-ban"></i>' + no_game_found + '<strong> ' + no_game_found_add + '</strong><span>' +
+                '</a></div>';
+        @else
+          return '<div class="nosearchresult bg-danger">' +
+                  '<span><i class="fa fa-ban"></i>' + no_game_found_add + '<span>' +
+                  '</div>';
+        @endif
+      },
       suggestion: function (data) {
           return '<div class="searchresult hvr-grow-shadow2"><span class="link"><div class="inline-block m-r-10"><span class="avatar"><img src="' + data.pic + '" class="img-circle"></span></div><div class="inline-block"><strong class="title">' + data.name + '</strong><span class="release-year m-l-5">' + data.release_year +'</span><br><small class="text-uc text-xs"><span class="platform-label" style="background-color: ' + data.platform_color + ';">' + data.platform_name + '</span></small></div></span></div>';
       }
@@ -1314,11 +1427,19 @@ $(document).ready(function(){
   $('#offersearch').bind('typeahead:selected', function(obj, datum, name) {
     var customTags = [ '<%', '%>' ];
     Mustache.tags = customTags;
-    var template = $('#selected-game').html();
+    if(add_type == "{{ trans('listings.form.product.name') }}") {
+        var template = $('#selected-product').html();
+    } else {
+        var template = $('#selected-game').html();
+    }
     Mustache.parse(template);   // optional, speeds up future uses
     var append_date = Mustache.render(template, datum);
     $('#select-game').slideUp(300);avgprice
-    $(append_date).hide().appendTo('.selected-game').slideDown(300);
+    if(add_type == "{{ trans('listings.form.product.name') }}") {
+        $(append_date).hide().appendTo('.selected-product').slideDown(300);
+    } else {
+        $(append_date).hide().appendTo('.selected-game').slideDown(300);
+    }
     $('.listing-form').delay(300).slideDown(300);
     setTimeout(function(){$('#offersearch').typeahead('val', ''); }, 10);
     {{-- Show average selling price if one exists --}}
@@ -1537,7 +1658,9 @@ $(document).ready(function(){
   {{-- End function to load digital distrubutors --}}
 
   @if(isset($game))
+  @if($game->platform)
   loadDigitalDistributors('{{ $game->platform->acronym }}');
+  @endif
   @endif
 
   {{-- Start fade in digital selection on checked checkbock --}}
@@ -1703,7 +1826,7 @@ $(document).ready(function(){
 
       e.preventDefault();
 
-      if($(this).parent().find('.get_price').is(':visible') &&                                  $(this).parent().find('.price_type').val() == "want") {
+      if($(this).parent().find('.get_price').is(':visible') && $(this).parent().find('.price_type').val() == "want") {
           $(this).parent().find('.get_price').hide("fast");
           $(this).parent().find('.price_type').val("none");
           $(this).removeClass("text-success");

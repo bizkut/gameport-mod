@@ -42,9 +42,15 @@
           <span class="selected-game-title">
             <strong>{{$game->name}}</strong>@if($game->release_date)<span class="release-year m-l-5">{{$game->release_date->format('Y')}}</span>@endif
           </span>
+          @if($game->platform)
           <span class="platform-label" style="background-color:{{$game->platform->color}}; ">
             {{$game->platform->name}}
           </span>
+          @elseif($game->category)
+          <span class="platform-label" style="background-color:{{$game->category->color}}; ">
+            {{$game->category->name}}
+          </span>
+          @endif
         </div>
       </div>
       {{-- End selected game panel --}}

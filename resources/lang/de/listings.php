@@ -42,6 +42,7 @@ return [
       'subheader' => [
           'buy_now' => 'Buy Now',
           'go_gameoverview' => 'Go to Gameoverview',
+          'go_productoverview' => 'Go to Productoverview',
           'details' => 'Details',
           'media' => 'Images & Videos',
       ],
@@ -51,6 +52,7 @@ return [
       'edit' => 'Edit Listing',
       'add' => 'Add Listing',
       'game' => [
+          'name' => 'Game',
           'select' => 'Select Game(Product)',
           'selected' => 'Selected Game(Product)',
           'add' => 'Add Game(Product)',
@@ -105,8 +107,8 @@ return [
           'trade_list' => 'You need to add at least one game to your trade list.',
           'delivery_pickup' => 'You need to select at least one option.',
           'price' => 'You need to enter a valid price.',
-          'no_game_found' => 'Sorry, no game found.',
-          'no_game_found_add' => 'Add new game to database.',
+          'no_game_found' => 'Sorry, no :Categoryname found.',
+          'no_game_found_add' => 'Add new :Categoryname to database.',
       ],
       'add_button' => 'Add Listing',
       'save_button' => 'Save Listing',

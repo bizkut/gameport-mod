@@ -28,7 +28,7 @@ class ProductCategoryCrudController extends CrudController
         */
         
         $this->crud->allowAccess('reorder');
-        $this->crud->enableReorder('name', 2);
+        $this->crud->enableReorder('name');
         
         // ------ CRUD FIELDS
         $this->crud->addField(['name'  => 'name', 'attributes' => ['required' => 'required']]);
@@ -41,15 +41,11 @@ class ProductCategoryCrudController extends CrudController
                                 'label' => 'Parent',
                                 'type' => 'select',
                                 'name' => 'parent_id',
-                                'entity' => 'parent',
+                                'entity' => 'parents',
                                 'attribute' => 'name',
                                 'model' => "App\Models\ProductCategory",
                             ]);
-        $this->crud->addField([
-                                'name' => 'status',
-                                'label' => 'Status',
-                                'type' => 'enum'
-                            ]);
+        $this->crud->addField(['name' => 'status', 'label' => 'Status','type' => 'enum']);
 
         // ------ CRUD COLUMNS
         $this->crud->addColumn(['name' => 'name', 'label' => 'Name']);

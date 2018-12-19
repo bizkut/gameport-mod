@@ -69,12 +69,12 @@ class ProductCategory extends Model
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\ProductCategory', 'parent_id');
+        return $this->belongsTo('App\Models\ProductCategory');
     }
 
     public function children()
     {
-        return $this->hasMany('App\Models\ProductCategory', 'parent_id');
+        return $this->hasMany('App\Models\ProductCategory');
     }
     
     public function childrens()
@@ -89,19 +89,14 @@ class ProductCategory extends Model
     
     public function games()
     {
-        return $this->hasMany('App\Models\Game', 'category_id');
+        return $this->hasMany('App\Models\Game', 'category_id', 'id');
     }
     
-    public function productsCount()
+    public function ownProductsCount()
     {
-        $childrens = $this->childrens()->get();
-        $children_ids = $this->getChildrenIds($childrens);
-        $count = 0;
-        if ($children_ids) {
-            $count = count(\App\Models\Game::whereIn('category_id', explode(",", $children_ids))->get());
-        }
-        $count = $count + $this->games()->count();
-        return $count;
+        return $this->hasOne('App\Models\Game')
+            ->selectRaw('category_id, count(*) as aggregate')
+            ->groupBy('category_id');
     }
     
     /*
@@ -128,6 +123,19 @@ class ProductCategory extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function productsCount()
+    {
+        $childrens = $this->childrens()->get();
+        $children_ids = $this->getChildrenIds($childrens);
+        $count = 0;
+        if ($children_ids) {
+            $count = count(\App\Models\Game::whereIn('category_id', explode(",", $children_ids))->get());
+        }
+        
+        $count = $count + $this->games()->count();
+        return $count;
+    }
+    
     /*
     |
     | Get URL
@@ -156,6 +164,16 @@ class ProductCategory extends Model
         } else {
             return '<span class="label label-danger">0</span>';
         }
+    }
+    
+    /*
+    |
+    | Get Listings count and cheapest listing for backend
+    |
+    */
+    public function getHierarchyAdmin()
+    {
+        return [1, 2];
     }
     
     /*

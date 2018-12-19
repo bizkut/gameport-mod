@@ -297,44 +297,47 @@ class UserRepository extends Repository
     {
         $user = parent::find($id);
         //$user->name = $request['name'];
-
+        
         //Address is not current address
         if ($user->email != $request['email']) {
-          //Emails have to be unique
-          if ($this->findByEmail($request['email'])) {
-              // show a success message
-              \Alert::error('<i class="fa fa-save m-r-5"></i>' . trans('users.alert.email_taken'))->flash();
-
-              return false;
-          }
-
-          $user->email = $request['email'];
+            //Emails have to be unique
+            if ($this->findByEmail($request['email'])) {
+                // show a success message
+                \Alert::error('<i class="fa fa-save m-r-5"></i>' . trans('users.alert.email_taken'))->flash();
+                
+                return false;
+            }
+            
+            $user->email = $request['email'];
         }
-
+        
+        $user->description = $request['description'];
+        $user->facebook_link = $request['facebook_link'];
+        $user->twitter_link = $request['twitter_link'];
+        
         if ($request->hasFile('avatar')) {
-
+            
             // Image Beta
             $extension = 'jpg';
             $newfilename = time().'-'.$user->id.'.'.$extension;
             $destination_path = "public/users";
-
-
+            
             $img = \Image::make($request->avatar->path());
             $disk = "local";
-
+            
             \Storage::disk($disk)->put($destination_path.'/'.$newfilename, $img->stream());
-
+            
             // Delete old image
             if (!is_null($user->avatar)) {
                 \Storage::disk($disk)->delete('/public/users/' . $user->avatar);
             }
-
+            
             $user->avatar = $newfilename;
         }
-
+        
         // show a success message
         \Alert::success('<i class="fa fa-save m-r-5"></i>' . trans('users.alert.profile_saved'))->flash();
-
+        
         return parent::save($user);
     }
 

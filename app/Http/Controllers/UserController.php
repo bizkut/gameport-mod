@@ -56,10 +56,10 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // Page title
         SEO::setTitle(trans('users.dash.settings.settings') . ' - ' . config('settings.page_name'));
-
+        
         return view('frontend.user.settings.profile', ['user' => auth()->user(), 'location' => auth()->user()->location]);
     }
 
@@ -76,7 +76,7 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $this->user->updateProfile(auth()->id(), $request);
         return redirect()->route('dashboard.settings');
     }
@@ -93,10 +93,10 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // Page title
         SEO::setTitle(trans('users.dash.settings.bankaccount') . ' - ' . config('settings.page_name'));
-
+        
         return view('frontend.user.settings.bankaccount', ['user' => auth()->user()]);
     }
 
@@ -112,7 +112,7 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // Page title
         $this->user->updateBankaccount(auth()->id(), $request);
         return redirect()->route('dashboard.settings');
@@ -130,10 +130,10 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // Page title
         SEO::setTitle(trans('users.dash.settings.password_heading') . ' - ' . config('settings.page_name'));
-
+        
         return view('frontend.user.settings.password', ['user' => auth()->user()]);
     }
 
@@ -150,7 +150,7 @@ class UserController
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $this->user->changePassword($request->all());
         return Redirect::to('dash/settings/password');
     }
@@ -163,28 +163,27 @@ class UserController
      */
     public function show($slug)
     {
-
         // Get user from slug string
-        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.user', 'listings.game.giantbomb', 'location')->where('name', $slug)->first();
-
+        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.game.category', 'listings.user', 'listings.game.giantbomb', 'location')->where('name', $slug)->first();
+        
         // Check if user exists
         if (is_null($user)) {
           return Redirect::to('/');
         }
-
+        
         // Page title
         SEO::setTitle(trans('general.title.profile', ['page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title'), 'user_name' => $user->name]));
-
+        
         // Get image size for og
         if ($user->avatar) {
             $imgsize = getimagesize($user->avatar_square);
             SEO::opengraph()->addImage(['url' => $user->avatar_square, ['height' => $imgsize[1], 'width' => $imgsize[0]]]);
         }
-
+        
         // Page description
         SEO::setDescription(trans('general.description.profile', ['user_name' => $user->name, 'listings_count' => $user->listings->count(), 'page_name' => config('settings.page_name'), 'sub_title' => config('settings.sub_title')]));
-
-        return view('frontend.user.show', ['user' => $user, 'listings' => $user->listings()->where('user_id', $user->id)->where('status', 0)->orWhere('status', null)->where('user_id', $user->id)->with('game','game.platform','user')->paginate(36), 'ratings' => $user->ratings()->with('user_from')->get()]);
+        
+        return view('frontend.user.show', ['user' => $user, 'listings' => $user->listings()->where('user_id', $user->id)->where('status', 0)->orWhere('status', null)->where('user_id', $user->id)->with('game','game.platform','game.category','user')->paginate(36), 'ratings' => $user->ratings()->with('user_from')->get()]);
     }
 
     /**
@@ -196,7 +195,7 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('notifications.title') . ' - ' . config('settings.page_name'));
-
+        
         return view('frontend.user.dash.notifications', ['user' => auth()->user()]);
     }
 
@@ -231,7 +230,6 @@ class UserController
      */
     public function notificationsReadAll()
     {
-
         $notification = auth()->user()->unreadNotifications->markAsRead();
         // show a success message
         \Alert::success('<i class="fa fa-check m-r-5"></i>' . trans('notifications.mark_all_read_alert'))->flash();
@@ -263,23 +261,23 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('users.dash.dashboard') . ' - ' . config('settings.page_name'));
-
+        
         // Save back URL for finished form
         Session::flash('backUrl', $request->fullUrl());
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
-        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
-
+        
+        $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.game.category', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
+        
         return view('frontend.user.dash.overview', ['user' => $user]);
     }
 
@@ -294,38 +292,38 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('general.listings') . ' - ' . config('settings.page_name'));
-
+        
         // Save back URL for finished form
         Session::flash('backUrl', $request->fullUrl());
-
+        
         // Check for right link, otherwise abort and send 404
         if (!($sort == null) && !($sort == 'complete') && !($sort == 'deleted')) {
             return abort('404');
         }
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $user = User::with('listings')->where('id', \Auth::user()->id)->first();
-
-        $listings_trashed_count = Listing::onlyTrashed()->where('user_id', $user->id)->where('deleted_at', '!=', null)->with('game', 'game.platform', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('deleted_at', 'desc')->count();
-
+        
+        $listings_trashed_count = Listing::onlyTrashed()->where('user_id', $user->id)->where('deleted_at', '!=', null)->with('game', 'game.platform', 'game.category', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('deleted_at', 'desc')->count();
+        
         if ($sort == 'complete') {
-            $listings = Listing::where('user_id', $user->id)->where('status', 2)->with('game', 'game.platform', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('updated_at', 'desc')->paginate('10');
+            $listings = Listing::where('user_id', $user->id)->where('status', 2)->with('game', 'game.platform', 'game.category', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('updated_at', 'desc')->paginate('10');
         } elseif ($sort == 'deleted') {
-            $listings = Listing::onlyTrashed()->where('user_id', $user->id)->where('deleted_at', '!=', null)->with('game', 'game.platform', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('deleted_at', 'desc')->paginate('10');
+            $listings = Listing::onlyTrashed()->where('user_id', $user->id)->where('deleted_at', '!=', null)->with('game', 'game.platform', 'game.category', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('deleted_at', 'desc')->paginate('10');
         } else {
             $listings = Listing::where('user_id', $user->id)->where('status', null)->orWhere('status', 0)->where('user_id', $user->id)->orWhere('status', 1)->where('user_id', $user->id)->with('game', 'game.platform', 'offers', 'offers.game', 'offers.user', 'offers.user.location')->orderBy('last_offer_at', 'desc')->paginate('10');
         }
-
+        
         return view('frontend.user.dash.listings', ['user' => $user,'listings' => $listings, 'listings_trashed_count' => $listings_trashed_count]);
     }
 
@@ -338,44 +336,42 @@ class UserController
      */
     public function offers(Request $request, $sort = null)
     {
-
         // Page title
         SEO::setTitle(trans('general.offers') . ' - ' . config('settings.page_name'));
-
+        
         // Save back URL for finished form
         Session::flash('backUrl', $request->fullUrl());
-
+        
         // Check for right link, otherwise abort and send 404
         if (!($sort == null) && !($sort == 'complete') && !($sort == 'declined') && !($sort == 'deleted')) {
             return abort('404');
         }
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $user = auth()->user();
-
-        $offers_trashed_count = Offer::onlyTrashed()->where('user_id', $user->id)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.user', 'listing.user.location')->orderBy('deleted_at', 'desc')->count();
-
-
+        
+        $offers_trashed_count = Offer::onlyTrashed()->where('user_id', $user->id)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.game.category', 'listing.user', 'listing.user.location')->orderBy('deleted_at', 'desc')->count();
+        
         if ($sort == 'complete') {
-            $offers = Offer::where('user_id', $user->id)->where('status', 2)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.user', 'listing.user.location')->orderBy('closed_at', 'desc')->paginate('10');
+            $offers = Offer::where('user_id', $user->id)->where('status', 2)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.game.category', 'listing.user', 'listing.user.location')->orderBy('closed_at', 'desc')->paginate('10');
         } elseif ($sort == 'declined') {
-            $offers = Offer::where('user_id', $user->id)->where('declined', 1)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.user', 'listing.user.location')->orderBy('closed_at', 'desc')->paginate('10');
+            $offers = Offer::where('user_id', $user->id)->where('declined', 1)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.game.category', 'listing.user', 'listing.user.location')->orderBy('closed_at', 'desc')->paginate('10');
         } elseif ($sort == 'deleted') {
-            $offers = Offer::onlyTrashed()->where('user_id', $user->id)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.user', 'listing.user.location')->orderBy('deleted_at', 'desc')->paginate('10');
+            $offers = Offer::onlyTrashed()->where('user_id', $user->id)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.game.category', 'listing.user', 'listing.user.location')->orderBy('deleted_at', 'desc')->paginate('10');
         } else {
-            $offers = Offer::where('user_id', $user->id)->where('status', null)->where('declined', 0)->orWhere('status', 0)->where('user_id', $user->id)->where('declined', 0)->orWhere('status', 1)->where('user_id', $user->id)->where('declined', 0)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.user', 'listing.user.location')->orderBy('updated_at', 'desc')->paginate('10');
+            $offers = Offer::where('user_id', $user->id)->where('status', null)->where('declined', 0)->orWhere('status', 0)->where('user_id', $user->id)->where('declined', 0)->orWhere('status', 1)->where('user_id', $user->id)->where('declined', 0)->with('game', 'listing', 'listing.game', 'listing.game.platform', 'listing.game.category', 'listing.user', 'listing.user.location')->orderBy('updated_at', 'desc')->paginate('10');
         }
-
+        
         return view('frontend.user.dash.offers', ['user' => $user,'offers' => $offers, 'offers_trashed_count' => $offers_trashed_count]);
     }
 
@@ -391,31 +387,31 @@ class UserController
         if (!(\Auth::check())) {
             return Redirect::to('/');
         }
-
+        
         // Check if user can ban users
         if (!(\Auth::user()->can('edit_users'))) {
             return Redirect::to('/');
         }
         // Get user
         $banuser = User::findOrFail($user_id);
-
+        
         // Check if admin / mod will selfban
         if (\Auth::user()->id == $banuser->id) {
             \Alert::error('<i class="fa fa-user-times m-r-5"></i> You cant ban yourself!')->flash();
             return redirect()->back();
         }
-
+        
         // Ban / Unban User
         $banuser->status = $banuser->status ? '0' : '1';
         $banuser->save();
-
+        
         // show a success message
         if ($banuser->status) {
             \Alert::success('<i class="fa fa-user-times m-r-5"></i> ' . $banuser->name . ' succesfully unbaned')->flash();
         } else {
             \Alert::error('<i class="fa fa-user-times m-r-5"></i> ' . $banuser->name  .' succesfully baned')->flash();
         }
-
+        
         return redirect()->back();
     }
 
@@ -429,7 +425,7 @@ class UserController
     {
         session()->put('latitude', $request->latitude);
         session()->put('longitude', $request->longitude);
-
+        
         return 'saved';
     }
 
@@ -444,22 +440,22 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('payment.transactions') . ' - ' . config('settings.page_name'));
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $transactions = Transaction::where('user_id', \Auth::user()->id)->orderBy('id','desc')->paginate('12');
-
+        
         $sale_count = Transaction::where('user_id', \Auth::user()->id)->where('type','sale')->count();
-
+        
         return view('frontend.user.dash.balance', ['transactions' => $transactions, 'sale_count' => $sale_count]);
     }
 
@@ -474,32 +470,32 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('payment.withdrawal.withdrawal') . ' - ' . config('settings.page_name'));
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // check if user has available balance
         if ( \Auth::user()->balance <= 0) {
             \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
             return redirect('dash/balance');
         }
-
+        
         if(!config('settings.paypal')) {
             return redirect('dash/balance/withdrawal/bank');
         }
-
+        
         $transactions = Transaction::where('user_id', \Auth::user()->id)->orderBy('id','desc')->get();
-
+        
         $withdrawal = Withdrawal::where('user_id', \Auth::user()->id)->where('status', '1')->paginate('12');
-
+        
         return view('frontend.user.dash.withdrawal', ['withdrawal' => $withdrawal, 'transactions' => $transactions, 'tab' => 'paypal']);
     }
 
@@ -516,49 +512,49 @@ class UserController
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $user = \Auth::user();
-
+        
         // check if user have available balance
         if ($user->balance <= 0) {
             \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
             return redirect('dash/balance');
         }
-
+        
         $withdrawal = new Withdrawal;
-
+        
         $withdrawal->user_id = $user->id;
         $withdrawal->payment_method = 'paypal';
         $withdrawal->payment_details = $request->paypal_email;
         $withdrawal->currency = config('settings.currency');
         $withdrawal->total = $user->balance;
-
+        
         $withdrawal->save();
-
+        
         // remove balance from user account
         $user->balance = 0.00;
         $user->save();
-
+        
         // sale transaction
         $withdrawal_transaction = new Transaction;
-
+        
         $withdrawal_transaction->type = 'withdrawal';
         $withdrawal_transaction->item_id = $withdrawal->id;
         $withdrawal_transaction->item_type = get_class($withdrawal);
         $withdrawal_transaction->user_id = $user->id;
         $withdrawal_transaction->total = $withdrawal->total;
         $withdrawal_transaction->currency = $withdrawal->currency;
-
+        
         $withdrawal_transaction->save();
-
+        
         \Alert::success('<i class="fa fa-check m-r-5"></i> ' . trans('payment.withdrawal.alert.successfully') .'')->flash();
-
+        
         return redirect('dash/balance');
     }
 
@@ -573,28 +569,28 @@ class UserController
     {
         // Page title
         SEO::setTitle(trans('payment.withdrawal.withdrawal') . ' - ' . config('settings.page_name'));
-
+        
         // Check if logged in
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         // check if user has available balance
         if ( \Auth::user()->balance <= 0) {
             \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
             return redirect('dash/balance');
         }
-
+        
         $transactions = Transaction::where('user_id', \Auth::user()->id)->orderBy('id','desc')->get();
-
+        
         $withdrawal = Withdrawal::where('user_id', \Auth::user()->id)->where('status', '1')->paginate('12');
-
+        
         return view('frontend.user.dash.withdrawal', ['withdrawal' => $withdrawal, 'transactions' => $transactions, 'tab' => 'bank']);
     }
 
@@ -611,49 +607,49 @@ class UserController
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $user = \Auth::user();
-
+        
         // check if user have available balance
         if ($user->balance <= 0) {
             \Alert::error('<i class="fa fa-times m-r-5"></i> ' . trans('payment.withdrawal.alert.no_balance') .'')->flash();
             return redirect('dash/balance');
         }
-
+        
         $withdrawal = new Withdrawal;
-
+        
         $withdrawal->user_id = $user->id;
         $withdrawal->payment_method = 'bank';
         $withdrawal->payment_details = '';
         $withdrawal->currency = config('settings.currency');
         $withdrawal->total = $user->balance;
-
+        
         $withdrawal->save();
-
+        
         // remove balance from user account
         $user->balance = 0.00;
         $user->save();
-
+        
         // sale transaction
         $withdrawal_transaction = new Transaction;
-
+        
         $withdrawal_transaction->type = 'withdrawal';
         $withdrawal_transaction->item_id = $withdrawal->id;
         $withdrawal_transaction->item_type = get_class($withdrawal);
         $withdrawal_transaction->user_id = $user->id;
         $withdrawal_transaction->total = $withdrawal->total;
         $withdrawal_transaction->currency = $withdrawal->currency;
-
+        
         $withdrawal_transaction->save();
-
+        
         \Alert::success('<i class="fa fa-check m-r-5"></i> ' . trans('payment.withdrawal.alert.successfully') .'')->flash();
-
+        
         return redirect('dash/balance');
     }
 
@@ -668,15 +664,15 @@ class UserController
         if (!(\Auth::check())) {
             return Redirect::to('/login');
         }
-
+        
         // check if user account is active
         if (! \Auth::user()->isActive()) {
             \Auth::logout();
             return redirect('login')->with('error', trans('auth.deactivated'));
         }
-
+        
         $user = \Auth::user();
-
+        
         // Subsribe user and add player id
         if ($func == 'add') {
             // Check if player id already exist
@@ -688,13 +684,13 @@ class UserController
                 );
             }
             return 'player id saved';
-
+            
         // Unsubscribe user and remove player id
         } elseif ($func == 'remove') {
             \DB::table('user_player_ids')->where('player_id', $request->player_id)->delete();
             return 'player id removed';
         }
-
+        
         return 'error';
     }
 
@@ -710,19 +706,18 @@ class UserController
         if (!request()->ajax()) {
             return abort('404');
         }
-
-        $users = User::hydrate(Searchy::users('name')->query($value)
-      ->getQuery()->where('id','!=',\Auth::user()->id)->limit(10)->get()->toArray() );
-
+        
+        $users = User::hydrate(Searchy::users('name')->query($value)->getQuery()->where('id','!=',\Auth::user()->id)->limit(10)->get()->toArray() );
+        
         $data = array();
-
+        
         foreach ($users as $user) {
             $data[" " . $user->id]['id'] = $user->id;
             $data[" " . $user->id]['name'] = $user->name;
             $data[" " . $user->id]['avatar'] = $user->avatar_square_tiny;
             $data[" " . $user->id]['status'] = $user->isOnline() ? 'online' : 'offline';
         }
-
+        
         // and return to typeahead
         return response()->json($data);
     }

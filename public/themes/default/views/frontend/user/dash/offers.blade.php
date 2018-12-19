@@ -163,7 +163,11 @@
             {{-- Game Name + platform --}}
             <div>
               <div class="title">{{ $offer->listing->game->name  }}</div>
+              @if($offer->listing->game->platform)
               <span class="platform-label" style="background-color:{{ $offer->listing->game->platform->color }};"> {{ $offer->listing->game->platform->name }} </span>
+              @elseif($offer->listing->game->category)
+              <span class="platform-label" style="background-color:{{ $offer->listing->game->category->color }};"> {{ $offer->listing->game->category->name }} </span>
+              @endif
             </div>
           </div>
         </div>
