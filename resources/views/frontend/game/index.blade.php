@@ -143,11 +143,8 @@
   <div class="modal fade modal-fade-in-scale-up modal-dark" id="modal_filter" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-
         <div class="modal-header">
-
           <div class="background-pattern" style="background-image: url('{{ asset('/img/game_pattern.png') }}');"></div>
-
           <div class="title">
             <button type="button" class="close" data-dismiss="modal">
               <span aria-hidden="true">×</span><span class="sr-only">{{ trans('general.close') }}</span>
@@ -158,13 +155,28 @@
               {{ trans('general.sortfilter.filter') }}
             </h4>
           </div>
-
         </div>
         {{-- Start platform filters --}}
         <div class="modal-seperator">
+            @if(isset($product))
+            {{ trans('general.sortfilter.filter_categories') }}
+            @else
             {{ trans('general.sortfilter.filter_platforms') }}
+            @endif
         </div>
-        <div class="modal-body">
+        <div class="modal-body">            
+            @if(isset($product))
+            @php
+                // Active filters
+                $active_filters = session()->get('listingsCategoryFilter') ?  session()->get('listingsCategoryFilter') : [];
+            @endphp
+            @foreach($categories as $category)
+                {{-- Category label --}}
+                <a href="#" class="label platform-label platform-filter m-r-5 m-b-5 inline-block {{ in_array($category->id, $active_filters) ? 'platform-filter-active' : '' }}" data-id="{{$category->id}}" data-color="{{$category->color}}" @if(in_array($category->id, $active_filters)) style="background-color:{{$category->color}};" @endif>
+                    {{ $category->name }}
+                </a>
+            @endforeach
+            @else
             @php
                 // Get all platforms
                 $platforms = Cache::rememberForever('platforms', function () {
@@ -179,7 +191,7 @@
                     {{ $platform->name }}
                 </a>
             @endforeach
-
+            @endif
         </div>
         {{-- End platform filters --}}
         <div class="modal-footer">
@@ -309,10 +321,14 @@
         $('.option-filter-active').each(function() {
             options.push($(this).data("filter"))
         });
+        var product = 0;
+        @if(isset($product))
+        product = 1;
+        @endif
         $.ajax({
             url:'{{ url("listings/filter") }}',
             type: 'POST',
-            data: {platformIds:platform_ids, options: options},
+            data: {platformIds:platform_ids, options: options, product: product},
             {{-- Send CSRF Token over ajax --}}
             headers: { 'X-CSRF-TOKEN': Laravel.csrfToken },
             success: function (data) {

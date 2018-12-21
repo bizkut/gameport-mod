@@ -173,11 +173,16 @@ Route::get('search/{value}', 'GameController@search')->name('search');
 Route::group(['prefix' => 'products'], function()
 {
     Route::get('/', 'GameController@indexProduct')->middleware('contentlength')->name('products');
+    Route::get('add/{category}', 'GameController@addProduct')->middleware('auth');
+    Route::post('edit', 'GameController@edit')->middleware('auth');
     Route::get('{slug}', 'GameController@showProduct')->name('product');
+    Route::post('add', 'GameController@store');
+    Route::get('{slug}/edit', 'GameController@editForm')->middleware('auth');
+    Route::get('{id}/images', 'GameController@images')->name('product.images');
     Route::get('{id}/trade', 'GameController@showTradeProduct');
-    Route::get('search/json/{value}', 'GameController@searchJsonProduct');
+    Route::get('search/json/{category}/{value}', 'GameController@searchJsonProduct');
     Route::get('order/{sort}/{desc?}', 'GameController@orderProduct');
-    
+
     // Wishlist
     Route::post('{slug}/wishlist/add', 'WishlistController@add');
     Route::post('{slug}/wishlist/update', 'WishlistController@update');

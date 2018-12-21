@@ -4,13 +4,25 @@
       <div>
           {{-- Filter Button with active filter count - open modal --}}
           <a href="#" data-toggle="modal" data-target="#modal_filter" class="btn btn-dark">
+            @if(isset($product))
+              <i class="fa fa-filter" aria-hidden="true"></i> {{ trans('general.sortfilter.filter') }} @if(session()->get('listingsCategoryFilter') || session()->has('listingsOptionFilter')) ({{ ( session()->has('listingsCategoryFilter') ? count(session()->get('listingsCategoryFilter')) : 0) + ( session()->has('listingsOptionFilter') ? count(session()->get('listingsOptionFilter')) : 0)}}) @endif
+            @else
               <i class="fa fa-filter" aria-hidden="true"></i> {{ trans('general.sortfilter.filter') }} @if(session()->get('listingsPlatformFilter') || session()->has('listingsOptionFilter')) ({{ ( session()->has('listingsPlatformFilter') ? count(session()->get('listingsPlatformFilter')) : 0) + ( session()->has('listingsOptionFilter') ? count(session()->get('listingsOptionFilter')) : 0)}}) @endif
+            @endif
           </a>
           {{-- Remove button - only visible with active filters --}}
+          @if(isset($product))
+          @if(session()->has('listingsCategoryFilter') || session()->has('listingsCategoryFilter'))
+          <a id="remove-filter" href="{{ url('listings/filter/remove') }}" class="m-l-5 btn btn-dark">
+              <i class="fa fa-times" aria-hidden="true"></i>
+          </a>
+          @endif
+          @else
           @if(session()->has('listingsPlatformFilter') || session()->has('listingsOptionFilter'))
           <a id="remove-filter" href="{{ url('listings/filter/remove') }}" class="m-l-5 btn btn-dark">
               <i class="fa fa-times" aria-hidden="true"></i>
           </a>
+          @endif
           @endif
       </div>
       {{-- End Filter button --}}

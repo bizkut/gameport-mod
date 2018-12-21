@@ -9,6 +9,7 @@ return [
     */
 
     'general' => [
+      'new' => 'New!',
       'newest_listings' => 'Newest Listings',
       'all_listings' => 'All Listings',
       'listings' => 'Listings',
@@ -21,10 +22,13 @@ return [
       'no_listings' => 'There are no listings available.',
       'no_listings_add' => 'Add first listing',
       'sold' => 'Not available',
-      'show_all' => 'Show all listing',
+      /* Start new strings v1.4.1 */
+      'show_all' => 'Show all listings',
+      /* End new strings v1.4.1 */
       'deleted' => 'Listing deleted.',
       'deleted_game' => 'Game deleted from system.',
       'no_description' => 'No description',
+      'open_google_maps' => 'Open in Google Maps',
       /* 5 Condition Levels - 1 is worst -> 5 is best */
       'conditions' => [
           '5' => 'Brand New',
@@ -53,11 +57,20 @@ return [
       'add' => 'Add Listing',
       'game' => [
           'name' => 'Game',
-          'select' => 'Select Game(Product)',
-          'selected' => 'Selected Game(Product)',
-          'add' => 'Add Game(Product)',
-          'not_found' => 'Game(Product) not found?',
-          'reselect' => 'Reselect Game(Product)',
+          'select' => 'Select Game',
+          'selected' => 'Selected Game',
+          'add' => 'Add Game',
+          'not_found' => 'Game not found?',
+          'reselect' => 'Reselect Game',
+          'reselect_info' => 'Warning: All Inputs will be cleared!',
+      ],
+      'product' => [
+          'name' => ':Categoryname',
+          'select' => 'Select :Categoryname',
+          'selected' => 'Selected :Categoryname',
+          'add' => 'Add :Categoryname',
+          'not_found' => ':Categoryname not found?',
+          'reselect' => 'Reselect :Categoryname',
           'reselect_info' => 'Warning: All Inputs will be cleared!',
       ],
       'details_title' => 'Details',
@@ -67,22 +80,18 @@ return [
           'description' => 'Description',
           'delivery_info' => 'No input for free delivery.',
       ],
-      'picture_upload' => [
-          'picture' => 'Picture',
-          'default' => 'Drag and drop a file here or click',
-          'replace' => 'Drag and drop or click to replace',
-          'remove' => 'Remove',
-          'error' => 'Ooops, something wrong happended.',
-          'error_filesize' => 'The file size is too big',
-          'error_minwidth' => 'The image width is too small',
-          'error_maxwidth' => 'The image width is too big',
-          'error_minheight' => 'The image height is too small',
-          'error_maxheight' => 'The image height is too big',
-          'error_imageformat' => 'The image format is not allowed',
-          'error_fileextension' => 'The file is not allowed',
+      /* Start new strings v1.4.0 */
+      'image_upload' => [
+          'images' => 'Images',
+          'empty_message' => 'Drop image files here or click to upload.',
+          'max_files_exceeded' => 'You can not upload any more files.',
+          'already_exists' => 'A file with this name already exists in the queue.',
+          'invalid_type' => 'You cannot upload files of this type.'
       ],
+      /* Start new strings v1.4.0 */
       'sell_title' => 'Sell details',
       'sell' => [
+          'avgprice' => 'Average selling price for :game_name: <strong>:avgprice</strong>',
           'price' => 'Price',
           'price_suggestions' => 'Price suggestions',
       ],
@@ -101,14 +110,17 @@ return [
           'delivery' => 'Delivery costs',
           'sell_price' => 'Price in :Currency_name...',
           'additional_charge' => 'In :Currency_name...',
-          'game_name' => 'Type your game(product) name...',
+          'game_name' => 'Type your game name...',
+          'product_name' => 'Type your :Categoryname name...',
       ],
       'validation' => [
           'trade_list' => 'You need to add at least one game to your trade list.',
           'delivery_pickup' => 'You need to select at least one option.',
           'price' => 'You need to enter a valid price.',
-          'no_game_found' => 'Sorry, no :Categoryname found.',
-          'no_game_found_add' => 'Add new :Categoryname to database.',
+          'no_game_found' => 'Sorry, no game found.',
+          'no_game_found_add' => 'Add new game to database.',
+          'no_product_found' => 'Sorry, no :Categoryname found.',
+          'no_product_found_add' => 'Add new :Categoryname to database.',
       ],
       'add_button' => 'Add Listing',
       'save_button' => 'Save Listing',

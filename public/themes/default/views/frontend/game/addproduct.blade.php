@@ -87,7 +87,7 @@
 {{-- Open form for product edit --}}
 @if(isset($product))
     {!! Form::open(array('url'=>'products/edit', 'id'=>'form-product', 'role'=>'form', 'files' => true )) !!}
-    <input name="product_id" type="hidden" value="{{ encrypt($product->id) }}" />
+    <input name="product_id" type="hidden" id="product_id" value="{{ encrypt($product->id) }}" />
     <input name="redirect" type="hidden" value"{{ url()->previous() }}" />
 {{-- Open form for new product  --}}
 @else
@@ -109,20 +109,20 @@
                     <label>
                         {{ trans('games.form.name') }} <strong><span class="text-danger">*</span></strong>
                     </label>
-                    <input type="text" class="form-control rounded input-lg inline input" id="name" name="name" placeholder="{{ trans('games.form.placeholder.name', ['CategoryName' => $category_name]) }}" required="required" />
+                    <input type="text" class="form-control rounded input-lg inline input" id="name" name="name" placeholder="{{ trans('games.form.placeholder.name', ['CategoryName' => $category_name]) }}" required="required" value="{{ isset($product) ? $product->name : '' }}"/>
                 </div>
                 {{-- Description (Summernote) --}}
                 <div class="input-group m-t-10">
                     <label>
                         {{ trans('games.form.description') }}
                     </label>
-                    {!! Form::textarea('description', null, array('class'=>'form-control input', 'placeholder'=>trans('games.form.placeholder.description', ['CategoryName' => $category_name]), 'id' => 'description' )) !!}
+                    {!! Form::textarea('description', (isset($product) ? $product->description : null), array('class'=>'form-control input', 'placeholder'=>trans('games.form.placeholder.description', ['CategoryName' => $category_name]), 'id' => 'description' )) !!}
                 </div>
 
                 {{-- Enable cover generator --}}
                 <div class="input-group">
                     <div class="checkbox-custom checkbox-default checkbox-lg">
-                        <input type="checkbox" id="cover_generator" name="cover_generator" />
+                        <input type="checkbox" id="cover_generator" name="cover_generator" {{ (isset($product) && $product->cover_generator) ? 'checked' : '' }} />
                         <label for="digital">
                             {{ trans('games.form.cover_generator') }}
                         </label>
@@ -158,7 +158,7 @@
                     </label>
                 </div>
                 <div class="input-group m-t-10">
-                    <input type="text" class="form-control rounded input-lg inline input" id="rlsdate" name="rlsdate" required="required">
+                    <input type="text" class="form-control rounded input-lg inline input" id="rlsdate" name="rlsdate" required="required" value="{{ isset($product) ? date('Y-m-d', strtotime($product->release_date)) : '' }}" />
                     <span class="input-group-addon">
                         <span>
                             <i class="fa fa-calendar-alt"></i>
@@ -171,7 +171,7 @@
                     <label>
                         {{ trans('games.form.publisher') }}
                     </label>
-                    <input type="text" class="form-control rounded input-lg inline input" id="publisher" name="publisher" placeholder="{{ trans('games.form.placeholder.publisher', ['CategoryName' => $category_name]) }}" />
+                    <input type="text" class="form-control rounded input-lg inline input" id="publisher" name="publisher" placeholder="{{ trans('games.form.placeholder.publisher', ['CategoryName' => $category_name]) }}" value="{{ isset($product) ? $product->publisher : '' }}" />
                 </div>
                 
                 {{-- Developer --}}
@@ -179,7 +179,7 @@
                     <label>
                         {{ trans('games.form.developer') }}
                     </label>
-                    <input type="text" class="form-control rounded input-lg inline input" id="developer" name="developer" placeholder="{{ trans('games.form.placeholder.developer', ['CategoryName' => $category_name]) }}" />
+                    <input type="text" class="form-control rounded input-lg inline input" id="developer" name="developer" placeholder="{{ trans('games.form.placeholder.developer', ['CategoryName' => $category_name]) }}" value="{{ isset($product) ? $product->developer : '' }}" />
                 </div>
                 
                 {{-- Pegi --}}
@@ -190,7 +190,7 @@
                     <select class="form-control select" id="pegi" name="pegi">
                         <option value>-</option>
                         @foreach($pegis as $pegi_key => $pegi_value)
-                        <option value="{{ $pegi_key }}">{{$pegi_value}}</option>
+                        <option value="{{ $pegi_key }}" {{ ( isset($product) && ($product->pegi == $pegi_key) ) ? 'selected' : '' }}>{{$pegi_value}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -200,15 +200,15 @@
                     <label>
                         {{ trans('games.form.category') }}
                     </label>
-                    @if (count($categories))
+                    @if(count($categories))
                     <select class="form-control select" id="category_id" name="category_id">
                         @foreach($categories as $category)
-                        <option value="{{ $category['id'] }}"> {{ $category['name'] }}</option>
+                        <option value="{{ $category['id'] }}" {{ ( isset($product) && ($product->category_id == $category['id']) ) ? 'selected' : '' }}> {{ $category['name'] }}</option>
                         @endforeach
                     </select>
                     @else
                     <select class="form-control select" id="category_id" name="category_id">
-                        <option value="{{$category_id}}">None</option>
+                        <option value="{{ $category_id }}"> None</option>
                     </select>
                     @endif
                 </div>
@@ -221,13 +221,21 @@
                     <select class="form-control select" id="genre_id" name="genre_id">
                         <option value>-</option>
                         @foreach($genres as $genre)
-                        <option value="{{ $genre->id }}">{{ $genre->name }}</option>
+                        <option value="{{ $genre->id }}" {{ ( isset($product) && ($product->genre_id == $genre->id) ) ? 'selected' : '' }}>{{ $genre->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="input-group m-t-10">
                     <div class="listing-buttons" id="submit_button">
-                        <button class="btn btn-lg btn-success" type="submit" id="submit-button"><i class="fa fa-plus"></i>{{ trans('games.add.add_product', ['CategoryName' => $category_name ]) }}</button>
+                        @if(isset($product))
+                        {{-- Cancel button --}}
+                        <a class="btn btn-lg btn-dark m-r-5" href="{{ $product->url_slug }}"><i class="fas fa-ban"></i> {{ trans('general.cancel') }}</a>
+                        {{-- Save Button --}}
+                        <button class="btn btn-lg btn-success" type="submit" id="submit-button"><i class="fa fa-save"></i> {{ trans('games.form.save_button', ['CategoryName' => $category_name ]) }}</button>
+                        @else
+                        {{-- Add Button --}}
+                        <button class="btn btn-lg btn-success" type="submit" id="submit-button"><i class="fa fa-plus"></i> {{ trans('games.form.add_button', ['CategoryName' => $category_name ]) }}</button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -281,8 +289,8 @@
                 maxFilesize: 10,
                 uploadMultiple: false,
                 dictRemoveFile: '<i class="fa fa-trash"></i>',
-                dictMaxFilesExceeded: '{{ trans('products.form.image_upload.max_files_exceeded') }}',
-                dictInvalidFileType: '{{ trans('products.form.image_upload.invalid_type') }}',
+                dictMaxFilesExceeded: '{{ trans('games.form.image_upload.max_files_exceeded') }}',
+                dictInvalidFileType: '{{ trans('games.form.image_upload.invalid_type') }}',
                 autoProcessQueue: false,
                 sending: function(file, xhr, formData) {
                   formData.append("_token", Laravel.csrfToken);
@@ -327,34 +335,20 @@
                         }
                     });
                     @if(isset($product))
-                    $.getJSON('{{ url('products/' . $product->id . '/images') }}', function (data) {
-                        $.each(data, function (key, value) {
-                            add_image_dz(value);
-                        });
-                    });
+                        var file = {
+                            name: "{{$product->name}}",
+                            size: '0',
+                            status: 'added',
+                            accepted: true,
+                        };
+                        this.emit('addedfile', file);
+                        this.emit('success', file,);
+                        this.emit('thumbnail', file, "{{$product->image_cover}}");
+                        this.emit('complete', file, true);
+                        this.files.push(file);
                     @endif
                 }
             });
-            
-            {{-- Dropzone var --}}
-            var myDropzone = Dropzone.forElement(".dropzone");
-            
-            @if(isset($product))
-            var add_image_dz = function (resp) {
-                // var file = {
-                //     name: resp.filename,
-                //     size: '0',
-                //     status: 'added',
-                //     accepted: true,
-                //     order: resp.order
-                // };
-                // myDropzone.emit('addedfile', file);
-                // myDropzone.emit('success', file,);
-                // myDropzone.emit('thumbnail', file, resp.thumbnail);
-                // myDropzone.emit('complete', file, true);
-                // myDropzone.files.push(file);
-            };
-            @endif
             
             {{--Form validator--}}
             $.validate({
@@ -377,29 +371,29 @@
                 }
             });
             
+            {{-- Dropzone var --}}
+            var myDropzone = Dropzone.forElement(".dropzone");
             @if(isset($product))
-            var add_image_dz = function (resp) {
-                // var file = {
-                //     name: resp.filename,
-                //     size: '0',
-                //     status: 'added',
-                //     accepted: true,
-                //     order: resp.order
-                // };
-                // myDropzone.emit('addedfile', file);
-                // myDropzone.emit('success', file,);
-                // myDropzone.emit('thumbnail', file, resp.thumbnail);
-                // myDropzone.emit('complete', file, true);
-                // myDropzone.files.push(file);
-            };
+                var add_image_dz = function (resp) {
+                var file = {
+                    name: resp.filename,
+                    size: '0',
+                    status: 'added',
+                    accepted: true,
+                    order: resp.order
+                };
+                myDropzone.emit('addedfile', file);
+                myDropzone.emit('success', file,);
+                myDropzone.emit('thumbnail', file, resp.thumbnail);
+                myDropzone.emit('complete', file, true);
+                myDropzone.files.push(file);
+                };
             @endif
             
-            @if(!isset($product))
             // Initialize Submit Button
             var submitButton = $('#submit-button');
             var uploading_files = false;
             var product_url;
-            var product_id;
             
             // Submit Button Event on click
             $('#form-product').on('submit', function(e) {
@@ -422,6 +416,9 @@
                     formData.append('pegi', $('#pegi').val());
                     formData.append('genre_id', $('#genre_id').val());
                     formData.append("_token", Laravel.csrfToken);
+                    @if(isset($product))
+                    formData.append('product_id', $('#product_id').val());
+                    @endif
                     if (images_queue.length > 0) {
                         for (var i = 0; i < images_queue.length; i++) {
                             let image = images_queue[i];
@@ -441,8 +438,7 @@
                         success: function(data) {
                             console.log(data);
                             product_url = data.url_slug;
-                            product_id = data.id;
-                            window.location={{ isset($product) ? '"' . $product->url_slug . '"' : 'product_url' }};
+                            window.location={{ isset($product) ? '"' . $product->url . '"' : 'product_url' }};
                         },
                         error: function(data) {
                             $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -455,15 +451,11 @@
                     });
                 }
             });
-            @else
-            var uploading_files = false;
-            var product_id = {{$product->id}};
-            @endif
             
             myDropzone.on('addedfile', function (file, start) {
                 if ($.inArray(file.name, current_queue) !== -1) {
                     current_queue.push(file.name);
-                    notie.alert('error', '{{ trans('products.form.image_upload.already_exists') }}',5);
+                    notie.alert('error', '{{ trans('games.form.image_upload.already_exists') }}',5);
                     //errors.html('');
                     myDropzone.removeFile(file);
                 } else {
@@ -480,56 +472,16 @@
             myDropzone.on('removedfile', function (file) {
                 current_queue.splice($.inArray(file.name, current_queue), 1);
                 images_queue.splice($.inArray(file, images_queue), 1);
-                {{--@if(isset($product))
-                sort();
-                $.ajax({
-                    url: '{{ url('products/' .  $product->id . '/images/remove')}}',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: Laravel.csrfToken,
-                        filename: file.name,
-                        order: file.order
-                    },
-                    success: function (data) {
-                    }
-                });
-                @endif--}}
-            });
-            
-            // on sending via dropzone append token and form values (using serializeObject jquery Plugin)
-            myDropzone.on("sending", function(file, xhr, formData) {
-                formData.append('_token', '{{ csrf_token() }}');
-                formData.append('product_id', product_id);
-                formData.append('order', file.order);
             });
             
             myDropzone.on("success", function(file) {
-                @if(isset($product))
-                    sort();
-                @endif
-                //myDropzone.options.autoProcessQueue = true;
-                @if(!isset($product))
-                if (myDropzone.getQueuedFiles().length == 0) {
-                    window.location=product_url;
-                }
-                @endif
-            });
-            
-            myDropzone.on("queuecomplete", function(){
-                if (uploading_files) {
-                    @if(isset($product))
-                        window.location="{{ $product->url_slug }}";
-                    @else
-                        window.location=product_url;
-                    @endif
-                }
+                myDropzone.options.autoProcessQueue = false;
             });
             
             // on error show errors
             myDropzone.on("error", function(file, errorMessage, xhr){
                 notie.alert('error', errorMessage, 5);
-            });
+            });           
             
         @endif
         

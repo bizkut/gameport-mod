@@ -145,7 +145,9 @@
             <ul class="dropdown-menu systems" role="menu">
               <li><a href="#">{{ trans('listings.form.game.name') }}</a></li>
               @can('edit_products')
-              <li><a href="#">{{ trans('listings.form.product.name') }}</a></li>
+              @foreach($categories as $category)
+              <li><a href="#" data-color="{{$category->color}}" data-id="{{$category->id}}">{{ trans('listings.form.product.name', ['Categoryname' => $category->name]) }}</a></li>
+              @endforeach
               @endcan
             </ul>
           </div>
@@ -228,11 +230,10 @@
             <div class="checkbox-custom checkbox-default checkbox-lg">
               @if(isset($game))
               @if($game->platform)
-              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->platform->acronym }}"/>
+              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->platform->acronym }}" {{ (isset($listing) && $listing->digital) ? 'checked' : '' }} @if(config('settings.digital_downloads_only')) checked disabled @endif/>
               @elseif($game->category)
-              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->category->acronym }}"/>
+              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="{{ $game->category->acronym }}" {{ (isset($listing) && $listing->digital) ? 'checked' : '' }} @if(config('settings.digital_downloads_only')) checked disabled @endif/>
               @endif
-              <input type="checkbox" id="digital" name="digital" autocomplete="off" data-platform="" {{ (isset($listing) && $listing->digital) ? 'checked' : '' }} @if(config('settings.digital_downloads_only')) checked disabled @endif/>
               @endif
               <label for="digital">
                 {{ trans('listings.form.details.digital') }}
@@ -1256,17 +1257,7 @@ $(document).ready(function(){
     $('.search-panel span#search_concept').text(concept);
     $('.input-group #search_param').val(platform);
     $('#platform_select').css("background-color", color );
-    if (concept == "{{ trans('listings.form.product.name') }}") {
-        $('.select-game-title').text("{{ trans('listings.form.product.select') }}");
-        $('#offersearch').attr("placeholder", "{{ trans('listings.form.placeholder.product_name') }}");
-        $('.add-name').text(" {{ trans('listings.form.product.add') }}");
-        $('.not-found').text(" {{ trans('listings.form.product.not_found') }}");
-        $('.add-link').attr("href", "{{ url('admin/product/create') }}");
-        $('#select_type').text(" {{ trans('listings.form.product.name') }}");
-        $('#selected-game-entry').removeClass('selected-game');
-        $('#selected-game-entry').addClass('selected-product');
-        add_type = "{{ trans('listings.form.product.name') }}";
-    } else {
+    if (concept == "{{ trans('listings.form.game.name') }}") {
         $('.select-game-title').text("{{ trans('listings.form.game.select') }}");
         $('#offersearch').attr("placeholder", "{{ trans('listings.form.placeholder.game_name') }}");
         $('.add-name').text(" {{ trans('listings.form.game.add') }}");
@@ -1276,6 +1267,20 @@ $(document).ready(function(){
         $('#selected-game-entry').removeClass('selected-product');
         $('#selected-game-entry').addClass('selected-game');
         add_type = "{{ trans('listings.form.game.name') }}";
+    } else {
+      @foreach($categories as $category)
+      if (concept == "{{$category->name}}") {
+          $('.select-game-title').text("{{ trans('listings.form.product.select', ['Categoryname' => $category->name]) }}");
+          $('#offersearch').attr("placeholder", "{{ trans('listings.form.placeholder.product_name', ['Categoryname' => $category->name]) }}");
+          $('.add-name').text(" {{ trans('listings.form.product.add', ['Categoryname' => $category->name]) }}");
+          $('.not-found').text(" {{ trans('listings.form.product.not_found', ['Categoryname' => $category->name]) }}");
+          $('.add-link').attr("href", "{{ url('products/add') }}" + "/" + "{{$category->id}}");
+          $('#select_type').text(" {{ trans('listings.form.product.name', ['Categoryname' => $category->name]) }}");
+          $('#selected-game-entry').removeClass('selected-game');
+          $('#selected-game-entry').addClass('selected-product');
+          add_type = "{{ trans('listings.form.product.name', ['Categoryname' => $category->name]) }}";
+      }
+      @endforeach
     }
 
     // Check if platform is selected
@@ -1367,10 +1372,14 @@ $(document).ready(function(){
     remote: {
       url: '{{ url("games/search/json/%QUERY") }}',
       replace: function(url, query) {
-        if(add_type == "{{ trans('listings.form.product.name') }}") {
-          return "{{ url("games/search/product/json/") }}" + "/" + query;
+        if (add_type == "{{ trans('listings.form.game.name') }}") {
+          return "{{ url("games/search/json/") }}" + "/" + query;
         } else {
-            return "{{ url("games/search/json/") }}" + "/" + query;
+          @foreach($categories as $category)
+          if (add_type == "{{$category->name}}") {
+            return "{{ url("products/search/json/") }}" + "/" + "{{$category->id}}" + "/" + query;
+          }
+          @endforeach
         }
       },
       wildcard: '%QUERY'
@@ -1389,14 +1398,18 @@ $(document).ready(function(){
     limit:6,
     templates: {
       empty: function() {
-        if(add_type == "{{ trans('listings.form.product.name') }}") {
-            game_add_url = "{{ url("admin/product/create") }}";
-            no_game_found = "{{ trans('listings.form.validation.no_product_found')}}";
-            no_game_found_add = "{{ trans('listings.form.validation.no_product_found_add')}}";
+        if(add_type == "{{ trans('listings.form.game.name') }}") {
+          game_add_url = "{{ url("games/add") }}";
+          no_game_found = "{{ trans('listings.form.validation.no_game_found')}}";
+          no_game_found_add = "{{ trans('listings.form.validation.no_game_found_add')}}";
         } else {
-            game_add_url = "{{ url("games/add") }}";
-            no_game_found = "{{ trans('listings.form.validation.no_game_found')}}";
-            no_game_found_add = "{{ trans('listings.form.validation.no_game_found_add')}}";
+          @foreach($categories as $category)
+          if (add_type == "{{$category->name}}") {
+            game_add_url = "{{ url("products/add") }}" + "/" + "{{$category->id}}";
+            no_game_found = "{{ trans('listings.form.validation.no_product_found', ['Categoryname' => $category->name])}}";
+            no_game_found_add = "{{ trans('listings.form.validation.no_product_found_add', ['Categoryname' => $category->name])}}";
+          }
+          @endforeach
         }
         {{-- Check if user can add games to the system --}}
         @if(Config::get('settings.user_add_item'))

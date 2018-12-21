@@ -2,9 +2,44 @@
 
 return [
 
+
     /*
     |--------------------------------------------------------------------------
-    | Sort / Filter Lines *New strings in v1.21
+    | Cookie Consent Lines
+    |--------------------------------------------------------------------------
+    */
+
+    'cookie' => [
+      'message' => "Your experience on this site will be improved by allowing cookies.",
+      'agree' => "Allow cookies",
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | 404 Error Page Lines
+    |--------------------------------------------------------------------------
+    */
+
+    '404' => [
+      'whops' => "Whoops!",
+      'couldnt_find' => "We couldn't find the page you <br /> were looking for.",
+      'return' => "Return to the homepage",
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Breadcrumbs Lines
+    |--------------------------------------------------------------------------
+    */
+
+    'breadcrumbs' => [
+      'profile' => ":Username's Profile",
+      'listing' => ":Username's :Gamename (:Platform) Listing",
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sort / Filter Lines
     |--------------------------------------------------------------------------
     */
 
@@ -12,10 +47,17 @@ return [
       'filter' => 'Filter',
       'filter_options' => 'Options',
       'filter_platforms' => 'Platforms',
+      'filter_categories' => 'Categories',
       'sort_by' => 'Sort by',
+      /* Start new strings v1.4.1 */
+      'sort_popularity' => 'Popularity',
+      /* End new strings v1.4.1 */
       'sort_date' => 'Date',
       'sort_price' => 'Price',
       'sort_distance' => 'Distance',
+      'sort_release' => 'Release',
+      'sort_metascore' => 'Metascore',
+      'sort_listings' => 'Listings',
     ],
 
     /*
@@ -60,6 +102,12 @@ return [
     |--------------------------------------------------------------------------
     */
 
+    'load_more' => 'Load more',
+    'home' => 'Home',
+    'theme' => 'Theme',
+    'language' => 'Language',
+
+
     'listings' => 'Listings',
     'games' => 'Games',
     'products' => 'Products',
@@ -95,7 +143,8 @@ return [
       'toggle_search' => 'Toggle Search',
       'listing_add' => 'Add Listing',
       'user' => [
-        'notifications_all' => 'Show all notifications',
+        'notifications_all' => 'All notifications',
+        'notifications_push_subscribe' => 'Subscribe to Push Notifications',
         'notifications_more' => '+ :count more',
         'admin' => 'Admin Panel',
         'dashboard' => 'Dashboard',
@@ -124,6 +173,7 @@ return [
       'games_all' => 'All games on :Page_name - :Sub_title',
       'game' => ':Game_name (:Platform) listings on :Page_name',
       'game_add' => 'Add new game to :Page_name',
+      'product_add' => 'Add new product to :Category_name',
       'search_result' => 'Search results for :value on :Page_name - :Sub_title',
       'welcome' => 'Welcome to :Page_name » :Sub_title',
       'profile' => ":User_name's Profile on :Page_name » :Sub_title",
@@ -139,6 +189,10 @@ return [
     'description' => [
       'listing_buy' => 'Buy :Game_name (:Platform) for :Price from :User_name (:Place)! Only on :Page_name - :Sub_title',
       'listing_trade' => 'Trade :Game_name (:Platform) from :User_name (:Place)! Only on :Page_name - :Sub_title',
+      'games_all' => 'Find the cheapest listings for over :games_count games! Only on :Page_name - :Sub_title',
+      'listings_all' => 'There are over :listings_count active listings! Only on :Page_name - :Sub_title',
+      'listings_platform' => 'There are over :listings_count active listings for :platform_name games! Only on :Page_name - :Sub_title',
+      'profile' => ":User_name has :listings_count active listings - :Page_name » :Sub_title",
     ],
 
     /*

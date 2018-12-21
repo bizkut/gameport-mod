@@ -380,7 +380,10 @@ class ListingController
         
         $user = User::with('listings', 'listings.game', 'listings.game.platform', 'listings.game.category', 'listings.offers', 'listings.offers.game', 'listings.offers.user', 'offers', 'offers.listing')->where('id', \Auth::user()->id)->first();
         
-        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all(), 'listing' => $listing, 'game' => $listing->game, 'trade_list' => $trade_list, 'user' => $user]);
+        $categories = ProductCategory::where('status', 'PUBLISHED')->where(function($q) {
+            $q->where('parent_id', null)->orWhere('parent_id', '')->orWhere('parent_id', 0)->orWhere('parent_id', '0');})->get();
+
+        return view('frontend.listing.form', ['platforms' => \App\Models\Platform::all(), 'listing' => $listing, 'game' => $listing->game, 'trade_list' => $trade_list, 'categories' => $categories, 'user' => $user]);
     }
 
     /**
@@ -936,7 +939,11 @@ class ListingController
      */
     public function filter(\Illuminate\Http\Request $request)
     {
-        session()->put('listingsPlatformFilter', $request->platformIds);
+        if ($request->product) {
+            session()->put('listingsCategoryFilter', $request->platformIds);
+        } else {
+            session()->put('listingsPlatformFilter', $request->platformIds);
+        }
         session()->put('listingsOptionFilter', $request->options);
 
         return url()->current() == url()->previous() ? url('/') : strtok(url()->previous(), '?');;
@@ -950,6 +957,7 @@ class ListingController
      */
     public function filterRemove()
     {
+        session()->remove('listingsCategoryFilter');
         session()->remove('listingsPlatformFilter');
         session()->remove('listingsOptionFilter');
 

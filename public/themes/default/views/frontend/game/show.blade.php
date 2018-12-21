@@ -306,7 +306,7 @@
         @if($game->platform)
         <a href="{{ url(config('backpack.base.route_prefix', 'admin') . '/game/' . $game->id . '/edit') }}" class="btn btn-dark m-r-5 m-t-10" target="_blank"><i class="fa fa-edit"></i> {{ trans('general.edit') }}</a>
         @elseif($game->category)
-        <a href="{{ url(config('backpack.base.route_prefix', 'admin') . '/product/' . $game->id . '/edit') }}" class="btn btn-dark m-r-5 m-t-10" target="_blank"><i class="fa fa-edit"></i> {{ trans('general.edit') }}</a>
+        <a href="{{ url($game->url_slug . '/edit') }}" class="btn btn-dark m-r-5 m-t-10"><i class="fa fa-edit"></i> {{ trans('general.edit') }}</a>
         @endif
         @if(isset($game->metacritic))
         {{-- Refresh metacritic data --}}

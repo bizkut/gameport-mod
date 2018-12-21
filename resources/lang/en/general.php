@@ -47,6 +47,7 @@ return [
       'filter' => 'Filter',
       'filter_options' => 'Options',
       'filter_platforms' => 'Platforms',
+      'filter_categories' => 'Categories',
       'sort_by' => 'Sort by',
       /* Start new strings v1.4.1 */
       'sort_popularity' => 'Popularity',
@@ -172,6 +173,7 @@ return [
       'games_all' => 'All games on :Page_name - :Sub_title',
       'game' => ':Game_name (:Platform) listings on :Page_name',
       'game_add' => 'Add new game to :Page_name',
+      'product_add' => 'Add new product to :Category_name',
       'search_result' => 'Search results for :value on :Page_name - :Sub_title',
       'welcome' => 'Welcome to :Page_name » :Sub_title',
       'profile' => ":User_name's Profile on :Page_name » :Sub_title",
