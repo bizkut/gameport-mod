@@ -124,7 +124,7 @@ class ListingCrudController extends CrudController
 
         // Trade list
         if ($listing->trade_list) {
-            $trade_list = \App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('giantbomb', 'platform', 'categpry')->get();
+            $trade_list = \App\Models\Game::whereIn('id', array_keys(json_decode($listing->trade_list, true)))->with('giantbomb', 'platform', 'category')->get();
         } else {
             $trade_list = null;
         }
